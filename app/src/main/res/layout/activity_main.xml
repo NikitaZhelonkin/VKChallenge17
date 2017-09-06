@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.vk.challenge.MainActivity">
+
+    <include layout="@layout/top_bar"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorDivider"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.vk.challenge.widget.PostView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/post_view"
+            android:layout_gravity="center">
+
+            <EditText
+                style="@style/EditText.Post"
+                android:id="@+id/post_edit_text"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_height="match_parent"/>
+
+        </com.vk.challenge.widget.PostView>
+
+
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorDivider"/>
+
+    <include layout="@layout/bottom_bar"/>
+
+
+</LinearLayout>

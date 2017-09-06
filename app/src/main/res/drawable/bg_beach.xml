@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/background_image"
+        android:drawable="@drawable/bg_beach_center"/>
+    <item
+        android:id="@+id/top_image"
+        android:drawable="@drawable/bg_beach_top"/>
+    <item
+        android:id="@+id/bottom_image"
+        android:drawable="@drawable/bg_beach_bottom"/>
+</layer-list>
