@@ -3,5 +3,8 @@
 
     <dimen name="topBarHeight">48dp</dimen>
     <dimen name="bottomBarHeight">56dp</dimen>
+    <dimen name="bgItemSize">32dp</dimen>
+    <dimen name="stickerItemSize">78dp</dimen>
+    <dimen name="stickerBottomSheetHeight">384dp</dimen>
 
 </resources>

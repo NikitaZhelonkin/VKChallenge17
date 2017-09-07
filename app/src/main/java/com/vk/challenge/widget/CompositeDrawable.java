@@ -16,13 +16,13 @@ import com.vk.challenge.R;
  * Created by nikita on 06.09.17.
  */
 
-public class BeachDrawable extends Drawable {
+public class CompositeDrawable extends Drawable {
 
     private Drawable mBackground;
     private Drawable mTopImage;
     private Drawable mBottomImage;
 
-    public BeachDrawable(LayerDrawable layerDrawable) {
+    public CompositeDrawable(LayerDrawable layerDrawable) {
         mBackground = layerDrawable.findDrawableByLayerId(R.id.background_image);
         mTopImage = layerDrawable.findDrawableByLayerId(R.id.top_image);
         mBottomImage = layerDrawable.findDrawableByLayerId(R.id.bottom_image);

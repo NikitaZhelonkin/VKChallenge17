@@ -10,9 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.vk.challenge.data.BackgroundItem;
-import com.vk.challenge.data.BackgroundItemsProvider;
-import com.vk.challenge.data.FontStyle;
+import com.vk.challenge.adapter.BackgroundThumbAdapter;
+import com.vk.challenge.data.model.BackgroundItem;
+import com.vk.challenge.data.model.NewBackgroundItem;
+import com.vk.challenge.data.provider.BackgroundItemsProvider;
+import com.vk.challenge.data.model.FontStyle;
 import com.vk.challenge.widget.PostView;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.api.VKApi;
@@ -33,7 +35,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
-public class MainActivity extends AppCompatActivity implements BackgroundThumbAdapter.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements
+        BackgroundThumbAdapter.OnItemClickListener,
+        StickerDialogFragment.Callback{
 
     @BindView(R.id.post_view)
     PostView mPostView;
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements BackgroundThumbAd
 
     @OnClick(R.id.action_sticker_btn)
     public void onStickerClick(View v) {
-        Toast.makeText(this, "TODO: open stickers", Toast.LENGTH_SHORT).show();
+        StickerDialogFragment.create().show(getSupportFragmentManager(), "strickers");
     }
 
     @OnClick(R.id.sendButton)
@@ -94,10 +98,19 @@ public class MainActivity extends AppCompatActivity implements BackgroundThumbAd
     }
 
     @Override
+    public void onStickerSelected(String sticker) {
+        mPostView.addSticker(sticker);
+    }
+
+    @Override
     public void onItemClick(int position, BackgroundItem item) {
         mThumbsAdapter.setCurrentItemPosition(position);
-        mPostView.setBackground(item.getDrawable());
-        mPostView.setFontStyle(item.getFontStyle());
+        if (item instanceof NewBackgroundItem) {
+            Toast.makeText(this, "Open popup", Toast.LENGTH_SHORT).show();
+        } else {
+            mPostView.setBackground(item.getDrawable());
+            mPostView.setFontStyle(item.getFontStyle());
+        }
     }
 
 

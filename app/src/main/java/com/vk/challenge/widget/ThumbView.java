@@ -5,11 +5,13 @@ import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 
+import com.makeramen.roundedimageview.RoundedImageView;
+
 /**
  * Created by nikita on 06.09.17.
  */
 
-public class ThumbView extends MaskImageView {
+public class ThumbView extends RoundedImageView {
 
 
     public ThumbView(Context context, AttributeSet attrs) {

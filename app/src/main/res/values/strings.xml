@@ -2,6 +2,6 @@
     <string name="app_name">Challenge</string>
     <string name="login">Войти через вконтакте</string>
     <string name="send">Отправить</string>
-
     <string name="post_hint">Что у вас нового?</string>
+    <string name="stickers">Стикеры</string>
 </resources>

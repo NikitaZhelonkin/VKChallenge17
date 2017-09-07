@@ -1,4 +1,4 @@
-package com.vk.challenge.data;
+package com.vk.challenge.data.provider;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -6,7 +6,10 @@ import android.graphics.drawable.LayerDrawable;
 import android.support.v4.content.ContextCompat;
 
 import com.vk.challenge.R;
-import com.vk.challenge.widget.BeachDrawable;
+import com.vk.challenge.data.model.BackgroundItem;
+import com.vk.challenge.data.model.FontStyle;
+import com.vk.challenge.data.model.NewBackgroundItem;
+import com.vk.challenge.widget.CompositeDrawable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +54,7 @@ public class BackgroundItemsProvider {
         );
         items.add(new BackgroundItem(
                 R.drawable.thumb_beach,
-                new BeachDrawable((LayerDrawable) ContextCompat.getDrawable(context, R.drawable.bg_beach)),
+                new CompositeDrawable((LayerDrawable) ContextCompat.getDrawable(context, R.drawable.bg_beach)),
                 new FontStyle(Color.WHITE, true))
         );
         items.add(new BackgroundItem(
@@ -59,6 +62,7 @@ public class BackgroundItemsProvider {
                 ContextCompat.getDrawable(context, R.drawable.bg_stars),
                 new FontStyle(Color.WHITE, true))
         );
+        items.add(new NewBackgroundItem());
         return  items;
     }
 }

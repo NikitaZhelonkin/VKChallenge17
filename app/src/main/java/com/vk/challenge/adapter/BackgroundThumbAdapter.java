@@ -1,11 +1,14 @@
-package com.vk.challenge;
+package com.vk.challenge.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
-import com.vk.challenge.data.BackgroundItem;
+import com.vk.challenge.R;
+import com.vk.challenge.data.model.BackgroundItem;
+import com.vk.challenge.data.model.NewBackgroundItem;
 import com.vk.challenge.widget.ThumbView;
 
 import java.util.List;
@@ -74,6 +77,9 @@ public class BackgroundThumbAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         public void bind(BackgroundItem item, boolean current) {
             mThumbView.setSelected(current);
             mThumbView.setImageResource(item.getThumbResId());
+            mThumbView.setScaleType(item instanceof NewBackgroundItem ?
+                    ImageView.ScaleType.CENTER :
+                    ImageView.ScaleType.FIT_CENTER);
         }
 
         @OnClick(R.id.itemView)

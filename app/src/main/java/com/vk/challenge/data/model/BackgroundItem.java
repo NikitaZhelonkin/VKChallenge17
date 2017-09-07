@@ -1,4 +1,4 @@
-package com.vk.challenge.data;
+package com.vk.challenge.data.model;
 
 import android.graphics.drawable.Drawable;
 
