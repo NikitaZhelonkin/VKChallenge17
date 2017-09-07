@@ -19,5 +19,7 @@ public class ThumbView extends MaskImageView {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
+        //TODO draw foreground for old api
     }
+
 }

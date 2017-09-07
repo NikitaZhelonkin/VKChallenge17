@@ -5,13 +5,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.model.VKScopes;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.login_btn)
     public void onLoginClick(View view) {
-        VKSdk.login(this, "wall");
+        VKSdk.login(this, VKScopes.PHOTOS, VKScopes.WALL);
     }
 
     private void showMainActivity() {

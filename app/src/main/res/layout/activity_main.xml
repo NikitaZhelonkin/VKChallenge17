@@ -21,18 +21,21 @@
         android:layout_weight="1">
 
         <com.vk.challenge.widget.PostView
+            android:id="@+id/post_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/post_view"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:clipChildren="false">
 
-            <EditText
-                style="@style/EditText.Post"
+            <com.vk.challenge.widget.FontBackgroundEditText
                 android:id="@+id/post_edit_text"
-                android:layout_width="match_parent"
+                style="@style/EditText.Post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_height="match_parent"/>
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:gravity="center"/>
 
         </com.vk.challenge.widget.PostView>
 

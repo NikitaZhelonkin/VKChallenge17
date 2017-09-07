@@ -12,12 +12,12 @@ public class BackgroundItem {
 
     Drawable mDrawable;
 
-    int mTextColor;
+    FontStyle mFontStyle;
 
-    public BackgroundItem(int thumbResId, int textColor, Drawable drawable) {
+    public BackgroundItem(int thumbResId, Drawable drawable, FontStyle fontStyle) {
         mThumbResId = thumbResId;
         mDrawable = drawable;
-        mTextColor = textColor;
+        mFontStyle = fontStyle;
     }
 
     public int getThumbResId() {
@@ -28,7 +28,7 @@ public class BackgroundItem {
         return mDrawable;
     }
 
-    public int getTextColor() {
-        return mTextColor;
+    public FontStyle getFontStyle() {
+        return mFontStyle;
     }
 }

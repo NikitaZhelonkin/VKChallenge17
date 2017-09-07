@@ -1,15 +1,17 @@
 package com.vk.challenge.widget;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import com.vk.challenge.R;
+import com.vk.challenge.data.FontStyle;
 
 /**
  * Created by nikita on 06.09.17.
@@ -17,9 +19,9 @@ import com.vk.challenge.R;
 
 public class PostView extends FrameLayout {
 
-    private EditText mEditText;
+    private FontBackgroundEditText mEditText;
 
-    private int mMaxHeight;
+    private FontStyle mFontStyle;
 
     public PostView(@NonNull Context context) {
         super(context);
@@ -36,30 +38,50 @@ public class PostView extends FrameLayout {
         init(context);
     }
 
-    private void init(Context context){
+    private void init(Context context) {
 
+    }
+
+    public void setFontStyle(FontStyle fontStyle) {
+        mEditText.setFontBackgroundColor(fontStyle.getFontBackgroundColor());
+        mEditText.setTextColor(fontStyle.getTextColor());
+        int shadowRadius = fontStyle.isShadow() ? 2 : 0;
+        int shadowDy = fontStyle.isShadow() ? 2 : 0;
+        int shadowColor = fontStyle.isShadow() ? Color.parseColor("#1e000000") : 0;
+        mEditText.setShadowLayer(shadowRadius, 0, shadowDy, shadowColor);
+        mFontStyle  = fontStyle;
+    }
+
+    public FontStyle getFontStyle() {
+        return mFontStyle;
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mEditText = (EditText) findViewById(R.id.post_edit_text);
+        mEditText = (FontBackgroundEditText) findViewById(R.id.post_edit_text);
     }
 
-    public void setTextColor(int color){
-        mEditText.setTextColor(ColorStateList.valueOf(color));
+    public Bitmap createBitmap() {
+        setEditTextFocusable(false);
+        Bitmap b = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        draw(c);
+        setEditTextFocusable(true);
+        return b;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        int height = getMeasuredHeight();
-        if (height != 0) {
-            mMaxHeight = mMaxHeight == 0 ? height : Math.min(height, mMaxHeight);
+        if (getMeasuredHeight() > getMeasuredWidth()) {
+            setMeasuredDimension(widthMeasureSpec, widthMeasureSpec);
         }
-        if (mMaxHeight != 0) {
-            setMeasuredDimension(widthMeasureSpec, MeasureSpec.makeMeasureSpec(mMaxHeight, MeasureSpec.EXACTLY));
-        }
+    }
+
+    private void setEditTextFocusable(boolean focusable) {
+        mEditText.setFocusable(focusable);
+        mEditText.setFocusableInTouchMode(focusable);
     }
 }

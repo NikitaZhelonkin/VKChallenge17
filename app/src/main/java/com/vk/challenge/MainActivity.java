@@ -1,6 +1,7 @@
 package com.vk.challenge;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,8 +12,21 @@ import android.widget.Toast;
 
 import com.vk.challenge.data.BackgroundItem;
 import com.vk.challenge.data.BackgroundItemsProvider;
+import com.vk.challenge.data.FontStyle;
 import com.vk.challenge.widget.PostView;
 import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKApiConst;
+import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.model.VKApiPhoto;
+import com.vk.sdk.api.model.VKAttachments;
+import com.vk.sdk.api.model.VKPhotoArray;
+import com.vk.sdk.api.model.VKWallPostResult;
+import com.vk.sdk.api.photo.VKImageParameters;
+import com.vk.sdk.api.photo.VKUploadImage;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,8 +76,11 @@ public class MainActivity extends AppCompatActivity implements BackgroundThumbAd
 
     @OnClick(R.id.action_font_btn)
     public void onFontClick(View v) {
-        Toast.makeText(this, "TODO: change font", Toast.LENGTH_SHORT).show();
-
+        if (mPostView.getFontStyle() == FontStyle.LIGHT) {
+            mPostView.setFontStyle(FontStyle.DARK);
+        } else {
+            mPostView.setFontStyle(FontStyle.LIGHT);
+        }
     }
 
     @OnClick(R.id.action_sticker_btn)
@@ -73,13 +90,59 @@ public class MainActivity extends AppCompatActivity implements BackgroundThumbAd
 
     @OnClick(R.id.sendButton)
     public void onSendClick(View v) {
-        Toast.makeText(this, "TODO: send", Toast.LENGTH_SHORT).show();
+        loadPhotoToMyWall(mPostView.createBitmap(), null);
     }
 
     @Override
     public void onItemClick(int position, BackgroundItem item) {
         mThumbsAdapter.setCurrentItemPosition(position);
         mPostView.setBackground(item.getDrawable());
-        mPostView.setTextColor(item.getTextColor());
+        mPostView.setFontStyle(item.getFontStyle());
+    }
+
+
+    private void makePost(VKAttachments att, String msg, final int ownerId) {
+        VKParameters parameters = new VKParameters();
+        parameters.put(VKApiConst.OWNER_ID, String.valueOf(ownerId));
+        parameters.put(VKApiConst.ATTACHMENTS, att);
+        parameters.put(VKApiConst.MESSAGE, msg);
+        VKRequest post = VKApi.wall().post(parameters);
+        post.setModelClass(VKWallPostResult.class);
+        post.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                Toast.makeText(MainActivity.this, "OK", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(VKError error) {
+                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadPhotoToMyWall(final Bitmap photo, final String message) {
+        VKRequest request = VKApi.uploadWallPhotoRequest(new VKUploadImage(photo,
+                VKImageParameters.jpgImage(0.9f)), getMyId(), 0);
+        request.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                if (!photo.isRecycled()) {
+                    photo.recycle();
+                }
+                VKApiPhoto photoModel = ((VKPhotoArray) response.parsedModel).get(0);
+                makePost(new VKAttachments(photoModel), message, getMyId());
+            }
+
+            @Override
+            public void onError(VKError error) {
+                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private int getMyId() {
+        final VKAccessToken vkAccessToken = VKAccessToken.currentToken();
+        return vkAccessToken != null ? Integer.parseInt(vkAccessToken.userId) : 0;
     }
 }
