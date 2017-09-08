@@ -14,12 +14,20 @@ import android.view.ViewConfiguration;
 
 public class StickerView extends AppCompatImageView {
 
+    public interface OnMoveListener{
+        void onStartMove(StickerView stickerView);
+        void onMove(StickerView stickerView);
+        void onMoveEnd(StickerView stickerView);
+    }
+
     private float mDownX;
     private float mDownY;
     private boolean mDragging;
     private int mTouchSlop;
 
     private Point mPosition = new Point();
+
+    private OnMoveListener mOnMoveListener;
 
     public StickerView(Context context) {
         super(context);
@@ -46,6 +54,10 @@ public class StickerView extends AppCompatImageView {
         updatePosition();
     }
 
+    public void setOnMoveListener(OnMoveListener onMoveListener) {
+        mOnMoveListener = onMoveListener;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getRawX();
@@ -55,6 +67,9 @@ public class StickerView extends AppCompatImageView {
             case MotionEvent.ACTION_DOWN:
                 mDownX = x;
                 mDownY = y;
+                if (mOnMoveListener != null) {
+                    mOnMoveListener.onStartMove(this);
+                }
                 return true;
             case MotionEvent.ACTION_MOVE:
                 float deltaX = x - mDownX;
@@ -66,6 +81,9 @@ public class StickerView extends AppCompatImageView {
                 if (mDragging) {
                     mPosition.offset((int) deltaX, (int) deltaY);
                     updatePosition();
+                    if (mOnMoveListener != null) {
+                        mOnMoveListener.onMove(this);
+                    }
                 }
                 mDownX = x;
                 mDownY = y;
@@ -75,6 +93,9 @@ public class StickerView extends AppCompatImageView {
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
                 mDragging = false;
+                if (mOnMoveListener != null) {
+                    mOnMoveListener.onMoveEnd(this);
+                }
                 return true;
         }
         return super.onTouchEvent(event);

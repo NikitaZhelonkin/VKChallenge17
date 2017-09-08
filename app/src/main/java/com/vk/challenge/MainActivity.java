@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onItemClick(int position, BackgroundItem item) {
         mThumbsAdapter.setCurrentItemPosition(position);
         if (item instanceof NewBackgroundItem) {
-            Toast.makeText(this, "Open popup", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Open gallery preview", Toast.LENGTH_SHORT).show();
         } else {
             mPostView.setBackground(item.getDrawable());
             mPostView.setFontStyle(item.getFontStyle());

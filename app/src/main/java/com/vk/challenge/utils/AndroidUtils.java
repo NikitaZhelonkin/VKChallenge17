@@ -1,5 +1,7 @@
-package com.vk.challenge;
+package com.vk.challenge.utils;
 
+import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
@@ -32,6 +34,14 @@ public class AndroidUtils {
                 return true;
             }
         });
+    }
+
+    public static int dpToPx(Context context, float value) {
+        if (value == 0) {
+            return 0;
+        }
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        return (int) Math.ceil(dm.density * value);
     }
 
 
