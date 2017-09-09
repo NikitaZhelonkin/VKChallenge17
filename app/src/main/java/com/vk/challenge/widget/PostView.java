@@ -2,6 +2,7 @@ package com.vk.challenge.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -340,6 +341,7 @@ public class PostView extends FrameLayout implements
         setBackground(null);
         Picasso.with(getContext())
                 .load(source)
+                .transform(new ResizeTransformation(1024))
                 .into(mImageView);
     }
 
