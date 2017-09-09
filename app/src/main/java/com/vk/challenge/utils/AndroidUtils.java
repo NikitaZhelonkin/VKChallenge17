@@ -1,9 +1,14 @@
 package com.vk.challenge.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
+import android.os.IBinder;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 
 /**
  * Created by nikita on 07.09.17.
@@ -11,18 +16,9 @@ import android.view.ViewTreeObserver;
 
 public class AndroidUtils {
 
-    public interface OnPreDraw {
-        void onPreDraw();
-    }
+    private static Point sDisplaySize;
 
-    public static void onPreDraw(final View view, final OnPreDraw onPreDraw) {
-        int width = view.getWidth();
-        int height = view.getHeight();
-        if (width > 0 && height > 0) {
-            onPreDraw.onPreDraw();
-            return;
-        }
-
+    public static void onPreDraw(final View view, final Runnable runnable) {
         view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
@@ -30,7 +26,7 @@ public class AndroidUtils {
                 if (observer.isAlive()) {
                     observer.removeOnPreDrawListener(this);
                 }
-                onPreDraw.onPreDraw();
+                runnable.run();;
                 return true;
             }
         });
@@ -42,6 +38,16 @@ public class AndroidUtils {
         }
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         return (int) Math.ceil(dm.density * value);
+    }
+
+    public static Point getDisplaySize(Activity activity) {
+        if (sDisplaySize != null) {
+            return sDisplaySize;
+        }
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return sDisplaySize = size;
     }
 
 

@@ -2,6 +2,7 @@ package com.vk.challenge.data.provider;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.v4.content.ContextCompat;
 
@@ -24,7 +25,7 @@ public class BackgroundItemsProvider {
         List<BackgroundItem> items = new ArrayList<>();
         items.add(new BackgroundItem(
                 R.drawable.thumb_white,
-                ContextCompat.getDrawable(context, R.drawable.bg_white),
+                new ColorDrawable(Color.WHITE),
                 new FontStyle(ContextCompat.getColor(context, R.color.colorText)))
         );
         items.add(new BackgroundItem(

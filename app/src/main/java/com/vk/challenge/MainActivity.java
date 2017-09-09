@@ -2,12 +2,20 @@ package com.vk.challenge;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.vk.challenge.adapter.BackgroundThumbAdapter;
@@ -15,6 +23,7 @@ import com.vk.challenge.data.model.BackgroundItem;
 import com.vk.challenge.data.model.NewBackgroundItem;
 import com.vk.challenge.data.provider.BackgroundItemsProvider;
 import com.vk.challenge.data.model.FontStyle;
+import com.vk.challenge.utils.KeyboardDetector;
 import com.vk.challenge.widget.PostView;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.api.VKApi;
@@ -36,18 +45,26 @@ import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
 public class MainActivity extends AppCompatActivity implements
-        BackgroundThumbAdapter.OnItemClickListener,
-        StickerDialogFragment.Callback{
+        BackgroundThumbAdapter.OnItemSelectedListener,
+        StickerDialogFragment.Callback,
+        KeyboardDetector.Listener{
 
+    @BindView(R.id.root_layout)
+    View mRootLayout;
     @BindView(R.id.post_view)
     PostView mPostView;
+    @BindView(R.id.post_edit_text)
+    EditText mEditText;
     @BindView(R.id.sendButton)
     Button mButton;
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
-    LinearLayoutManager mLayoutManager;
+    @BindView(R.id.gallery_cover)
+    View mGalleryCover;
 
-    BackgroundThumbAdapter mThumbsAdapter;
+    private GalleryWindow mGalleryWindow;
+
+    private KeyboardDetector mKeyboardDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +78,64 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         setContentView(R.layout.activity_main);
-
         ButterKnife.bind(this);
 
-        mThumbsAdapter = new BackgroundThumbAdapter();
-        mThumbsAdapter.setOnItemClickListener(this);
-        mThumbsAdapter.setItems(BackgroundItemsProvider.getItems(this));
+        mKeyboardDetector = new KeyboardDetector(this);
+        mKeyboardDetector.setKeyboardListener(this);
 
-        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mThumbsAdapter);
+
+        mEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isGalleryVisible()) {
+                    hideGallery();
+                }
+            }
+        });
+
+        mGalleryWindow = new GalleryWindow(this);
+        mGalleryWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+
+            @Override
+            public void onDismiss() {
+                mGalleryCover.setVisibility(LinearLayout.GONE);
+            }
+        });
+
+
+        BackgroundThumbAdapter thumbsAdapter = new BackgroundThumbAdapter();
+        thumbsAdapter.setOnItemSelectedListener(this);
+        thumbsAdapter.setItems(BackgroundItemsProvider.getItems(this));
+        thumbsAdapter.selectItem(0);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setAdapter(thumbsAdapter);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (isGalleryVisible()) {
+            hideGallery();
+            return false;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
+    }
+
+    @Override
+    public void onKeyboardDetected(boolean visible) {
+        if (visible) {
+            if (isGalleryVisible()) {
+                hideGallery();
+            }
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    mKeyboardDetector.getKeyboardHeight());
+            mGalleryCover.setLayoutParams(params);
+        } else {
+            hideGallery();
+        }
     }
 
     @OnTextChanged(R.id.post_edit_text)
@@ -103,16 +168,36 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onItemClick(int position, BackgroundItem item) {
-        mThumbsAdapter.setCurrentItemPosition(position);
+    public void onItemSelected(BackgroundItem item) {
         if (item instanceof NewBackgroundItem) {
-            Toast.makeText(this, "Open gallery preview", Toast.LENGTH_SHORT).show();
+            showGallery();
         } else {
+            hideGallery();
             mPostView.setBackground(item.getDrawable());
             mPostView.setFontStyle(item.getFontStyle());
         }
+        boolean white = item.getDrawable() instanceof ColorDrawable &&
+                ((ColorDrawable) item.getDrawable()).getColor() == Color.WHITE;
+        mPostView.setTrashWithBorder(white);
     }
 
+    private void showGallery() {
+        mGalleryWindow.setHeight((mKeyboardDetector.getKeyboardHeight()));
+        if (mKeyboardDetector.isKeyboardVisible()) {
+            mGalleryCover.setVisibility(LinearLayout.GONE);
+        } else {
+            mGalleryCover.setVisibility(LinearLayout.VISIBLE);
+        }
+        mGalleryWindow.showAtLocation(mRootLayout, Gravity.BOTTOM, 0, 0);
+    }
+
+    private void hideGallery() {
+        mGalleryWindow.dismiss();
+    }
+
+    private boolean isGalleryVisible() {
+        return mGalleryWindow.isShowing();
+    }
 
     private void makePost(VKAttachments att, String msg, final int ownerId) {
         VKParameters parameters = new VKParameters();

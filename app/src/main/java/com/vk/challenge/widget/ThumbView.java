@@ -24,4 +24,11 @@ public class ThumbView extends RoundedImageView {
         //TODO draw foreground for old api
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (getMeasuredWidth() != getMeasuredHeight()) {
+            setMeasuredDimension(getMeasuredHeight(), getMeasuredHeight());
+        }
+    }
 }

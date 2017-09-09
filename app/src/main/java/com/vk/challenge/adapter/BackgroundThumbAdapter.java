@@ -22,13 +22,13 @@ import butterknife.OnClick;
 
 public class BackgroundThumbAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public interface OnItemClickListener {
-        void onItemClick(int position, BackgroundItem item);
+    public interface OnItemSelectedListener {
+        void onItemSelected(BackgroundItem item);
     }
 
     private List<BackgroundItem> mData;
 
-    private OnItemClickListener mOnItemClickListener;
+    private OnItemSelectedListener mOnItemSelectedListener;
 
     private int mCurrentItemPosition;
 
@@ -37,13 +37,16 @@ public class BackgroundThumbAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         notifyDataSetChanged();
     }
 
-    public void setCurrentItemPosition(int currentItemPosition) {
-        mCurrentItemPosition = currentItemPosition;
+    public void selectItem(int position) {
+        mCurrentItemPosition = position;
+        if (mOnItemSelectedListener != null) {
+            mOnItemSelectedListener.onItemSelected(mData.get(position));
+        }
         notifyDataSetChanged();
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        mOnItemClickListener = onItemClickListener;
+    public void setOnItemSelectedListener(OnItemSelectedListener onItemSelectedListener) {
+        mOnItemSelectedListener = onItemSelectedListener;
     }
 
     @Override
@@ -88,9 +91,7 @@ public class BackgroundThumbAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             if (position == RecyclerView.NO_POSITION) {
                 return;
             }
-            if (mOnItemClickListener != null) {
-                mOnItemClickListener.onItemClick(position, mData.get(position));
-            }
+            selectItem(position);
         }
     }
 }

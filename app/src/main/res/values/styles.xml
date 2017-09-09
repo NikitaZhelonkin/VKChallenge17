@@ -38,4 +38,9 @@
 
     <style name="Theme.BottomSheetDialog.Stickers" parent="Theme.Design.Light.BottomSheetDialog"/>
 
+    <style name="Animation.Popup" parent="Animation.Design.BottomSheetDialog">
+        <item name="android:windowEnterAnimation">@anim/popup_in</item>
+        <item name="android:windowExitAnimation">@anim/popup_out</item>
+    </style>
+
 </resources>

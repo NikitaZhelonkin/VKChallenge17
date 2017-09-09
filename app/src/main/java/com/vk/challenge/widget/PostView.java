@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -85,7 +86,7 @@ public class PostView extends FrameLayout implements
     protected void onFinishInflate() {
         super.onFinishInflate();
         mEditText = (FontBackgroundEditText) findViewById(R.id.post_edit_text);
-        mTrashView = (ImageView) findViewById(R.id.trash);
+        mTrashView = (ImageView) findViewById(R.id.trash_fab);
     }
 
     public void setFontStyle(FontStyle fontStyle) {
@@ -111,6 +112,18 @@ public class PostView extends FrameLayout implements
         return b;
     }
 
+    public EditText getEditText(){
+        return mEditText;
+    }
+
+    public void setTrashWithBorder(boolean border) {
+        if(border){
+            mTrashView.setBackgroundResource(R.drawable.bg_trash_with_border);
+        }else{
+            mTrashView.setBackgroundResource(R.drawable.bg_trash);
+        }
+    }
+
     public void addSticker(final String sticker) {
         final StickerView stickerView = createStickerView(sticker);
         ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(
@@ -120,9 +133,9 @@ public class PostView extends FrameLayout implements
         stickerView.setOnMoveListener(this);
         addView(stickerView, params);
         bringStickerToFront(stickerView);
-        AndroidUtils.onPreDraw(stickerView, new AndroidUtils.OnPreDraw() {
+        AndroidUtils.onPreDraw(stickerView, new Runnable() {
             @Override
-            public void onPreDraw() {
+            public void run() {
                 Rect rect = new Rect();
                 rect.right = getWidth() - stickerView.getMeasuredWidth() / 2;
                 rect.bottom = stickerView.getMeasuredHeight() / 2;
