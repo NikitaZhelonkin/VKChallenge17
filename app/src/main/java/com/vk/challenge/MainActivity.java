@@ -1,17 +1,26 @@
 package com.vk.challenge;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -19,7 +28,9 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.vk.challenge.adapter.BackgroundThumbAdapter;
+import com.vk.challenge.adapter.GalleryAdapter;
 import com.vk.challenge.data.model.BackgroundItem;
+import com.vk.challenge.data.model.GalleryItem;
 import com.vk.challenge.data.model.NewBackgroundItem;
 import com.vk.challenge.data.provider.BackgroundItemsProvider;
 import com.vk.challenge.data.model.FontStyle;
@@ -46,8 +57,11 @@ import butterknife.OnTextChanged;
 
 public class MainActivity extends AppCompatActivity implements
         BackgroundThumbAdapter.OnItemSelectedListener,
+        GalleryAdapter.Callback,
         StickerDialogFragment.Callback,
         KeyboardDetector.Listener{
+
+    private static final int PERM_REQ_CODE = 1;
 
     @BindView(R.id.root_layout)
     View mRootLayout;
@@ -65,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements
     private GalleryWindow mGalleryWindow;
 
     private KeyboardDetector mKeyboardDetector;
+
+    private BackgroundThumbAdapter mThumbsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         mGalleryWindow = new GalleryWindow(this);
+        mGalleryWindow.setCallback(this);
         mGalleryWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
 
             @Override
@@ -101,16 +118,32 @@ public class MainActivity extends AppCompatActivity implements
                 mGalleryCover.setVisibility(LinearLayout.GONE);
             }
         });
+        if (isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            mGalleryWindow.load();
+        }
 
-
-        BackgroundThumbAdapter thumbsAdapter = new BackgroundThumbAdapter();
-        thumbsAdapter.setOnItemSelectedListener(this);
-        thumbsAdapter.setItems(BackgroundItemsProvider.getItems(this));
-        thumbsAdapter.selectItem(0);
+        mThumbsAdapter = new BackgroundThumbAdapter();
+        mThumbsAdapter.setOnItemSelectedListener(this);
+        mThumbsAdapter.setItems(BackgroundItemsProvider.getItems(this));
+        mThumbsAdapter.selectItem(0);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(thumbsAdapter);
+        mRecyclerView.setAdapter(mThumbsAdapter);
+        mRecyclerView.setItemAnimator(null);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERM_REQ_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showGallery();
+            }else{
+                mGalleryWindow.clearSelection();
+                mThumbsAdapter.backSelection();
+            }
+        }
     }
 
     @Override
@@ -121,6 +154,14 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             return super.onKeyDown(keyCode, event);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mGalleryWindow != null) {
+            mGalleryWindow.release();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -173,15 +214,35 @@ public class MainActivity extends AppCompatActivity implements
             showGallery();
         } else {
             hideGallery();
-            mPostView.setBackground(item.getDrawable());
+            mPostView.setImage(item.getDrawable());
             mPostView.setFontStyle(item.getFontStyle());
+            mGalleryWindow.clearSelection();
         }
         boolean white = item.getDrawable() instanceof ColorDrawable &&
                 ((ColorDrawable) item.getDrawable()).getColor() == Color.WHITE;
         mPostView.setTrashWithBorder(white);
     }
 
+    @Override
+    public void onGalleryItemSelected(GalleryItem galleryItem) {
+        mPostView.setImage(galleryItem.getPath());
+    }
+
+    @Override
+    public void onTakePhotoClick() {
+        Toast.makeText(this, "Take photo", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onOpenExternalGalleryClick() {
+        Toast.makeText(this, "Open Gallery", Toast.LENGTH_SHORT).show();
+    }
+
     private void showGallery() {
+        if (!requestMediaPermission()) {
+            return;
+        }
+        mGalleryWindow.load();
         mGalleryWindow.setHeight((mKeyboardDetector.getKeyboardHeight()));
         if (mKeyboardDetector.isKeyboardVisible()) {
             mGalleryCover.setVisibility(LinearLayout.GONE);
@@ -189,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements
             mGalleryCover.setVisibility(LinearLayout.VISIBLE);
         }
         mGalleryWindow.showAtLocation(mRootLayout, Gravity.BOTTOM, 0, 0);
+
     }
 
     private void hideGallery() {
@@ -197,6 +259,48 @@ public class MainActivity extends AppCompatActivity implements
 
     private boolean isGalleryVisible() {
         return mGalleryWindow.isShowing();
+    }
+
+    private boolean requestMediaPermission() {
+        if (!isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if (shouldShowPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                new AlertDialog.Builder(this)
+                        .setMessage(R.string.permission_rationale)
+                        .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, PERM_REQ_CODE);
+                            }
+                        })
+                        .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mThumbsAdapter.backSelection();
+                                mGalleryWindow.clearSelection();
+                            }
+                        })
+                        .create()
+                        .show();
+            } else {
+                requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, PERM_REQ_CODE);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean isPermissionGranted(String permission) {
+        return ContextCompat.checkSelfPermission(this, permission)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean shouldShowPermissionRationale(String permission) {
+        return ActivityCompat.shouldShowRequestPermissionRationale(this, permission);
+    }
+
+    private void  requestPermission(String permission, int requestCode){
+        ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
     }
 
     private void makePost(VKAttachments att, String msg, final int ownerId) {

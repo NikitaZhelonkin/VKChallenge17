@@ -77,6 +77,8 @@ public class StickerView extends AppCompatImageView {
 
                 if (!mDragging && (Math.abs(deltaX) > mTouchSlop || Math.abs(deltaY) > mTouchSlop)) {
                     mDragging = true;
+                    deltaX = 0;
+                    deltaY = 0;
                 }
                 if (mDragging) {
                     mPosition.offset((int) deltaX, (int) deltaY);

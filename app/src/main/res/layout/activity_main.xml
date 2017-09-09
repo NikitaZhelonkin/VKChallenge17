@@ -29,6 +29,13 @@
             android:layout_gravity="center"
             android:clipChildren="false">
 
+            <ImageView
+                android:contentDescription="@null"
+                android:id="@+id/post_image_view"
+                android:layout_width="match_parent"
+                android:scaleType="centerCrop"
+                android:layout_height="match_parent"/>
+
             <com.vk.challenge.widget.FontBackgroundEditText
                 android:id="@+id/post_edit_text"
                 style="@style/EditText.Post"

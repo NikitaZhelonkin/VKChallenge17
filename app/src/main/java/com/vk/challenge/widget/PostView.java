@@ -8,10 +8,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -42,6 +44,7 @@ public class PostView extends FrameLayout implements
 
     private int mMaxHeight;
 
+    private ImageView mImageView;
     private FontBackgroundEditText mEditText;
     private ImageView mTrashView;
 
@@ -60,7 +63,6 @@ public class PostView extends FrameLayout implements
     private View mStickerToDelete;
 
     private boolean mAnimatingTrashHide;
-
 
     public PostView(@NonNull Context context) {
         super(context);
@@ -85,6 +87,7 @@ public class PostView extends FrameLayout implements
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        mImageView = (ImageView) findViewById(R.id.post_image_view);
         mEditText = (FontBackgroundEditText) findViewById(R.id.post_edit_text);
         mTrashView = (ImageView) findViewById(R.id.trash_fab);
     }
@@ -110,10 +113,6 @@ public class PostView extends FrameLayout implements
         draw(c);
         setEditTextFocusable(true);
         return b;
-    }
-
-    public EditText getEditText(){
-        return mEditText;
     }
 
     public void setTrashWithBorder(boolean border) {
@@ -185,13 +184,11 @@ public class PostView extends FrameLayout implements
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        int height = getMeasuredHeight();
-        if (height != 0) {
-            mMaxHeight = mMaxHeight == 0 ? height : Math.min(height, mMaxHeight);
+        if (getMeasuredHeight() != 0) {
+            mMaxHeight = mMaxHeight == 0 ? getMeasuredHeight() : Math.min(getMeasuredHeight(), mMaxHeight);
         }
         if (mMaxHeight != 0) {
-            setMeasuredDimension(widthMeasureSpec, MeasureSpec.makeMeasureSpec(mMaxHeight, MeasureSpec.EXACTLY));
+            super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(mMaxHeight, MeasureSpec.EXACTLY));
         }
     }
 
@@ -332,6 +329,18 @@ public class PostView extends FrameLayout implements
     @Override
     public void onRotationEnd(RotationGestureDetector rotationDetector) {
         //do nothing
+    }
+
+    public void setImage(Drawable drawable) {
+        Picasso.with(getContext()).cancelRequest(mImageView);
+        mImageView.setImageDrawable(drawable);
+    }
+
+    public void setImage(String source) {
+        setBackground(null);
+        Picasso.with(getContext())
+                .load(source)
+                .into(mImageView);
     }
 
     private View findTargetSticker(MotionEvent event) {

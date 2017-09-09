@@ -11,6 +11,7 @@ import com.vk.challenge.data.model.BackgroundItem;
 import com.vk.challenge.data.model.NewBackgroundItem;
 import com.vk.challenge.widget.ThumbView;
 
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -30,7 +31,8 @@ public class BackgroundThumbAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     private OnItemSelectedListener mOnItemSelectedListener;
 
-    private int mCurrentItemPosition;
+    private int mLastSelectedPosition;
+    private int mSelectedPosition;
 
     public void setItems(List<BackgroundItem> data) {
         mData = data;
@@ -38,11 +40,22 @@ public class BackgroundThumbAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     public void selectItem(int position) {
-        mCurrentItemPosition = position;
         if (mOnItemSelectedListener != null) {
             mOnItemSelectedListener.onItemSelected(mData.get(position));
         }
-        notifyDataSetChanged();
+        mLastSelectedPosition = mSelectedPosition;
+        mSelectedPosition = position;
+
+        if (mLastSelectedPosition != -1) {
+            notifyItemChanged(mLastSelectedPosition, "selection");
+        }
+        if (mSelectedPosition != -1) {
+            notifyItemChanged(mSelectedPosition, "selection");
+        }
+    }
+
+    public void backSelection(){
+        selectItem(mLastSelectedPosition);
     }
 
     public void setOnItemSelectedListener(OnItemSelectedListener onItemSelectedListener) {
@@ -56,9 +69,20 @@ public class BackgroundThumbAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
+        if (holder instanceof ViewHolder) {
+            if (payloads != null && payloads.size() > 0) {
+                ((ViewHolder) holder).mThumbView.setSelected(position == mSelectedPosition);
+                return;
+            }
+        }
+        super.onBindViewHolder(holder, position, payloads);
+    }
+
+    @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewHolder) {
-            ((ViewHolder) holder).bind(mData.get(position), position == mCurrentItemPosition);
+            ((ViewHolder) holder).bind(mData.get(position), position == mSelectedPosition);
         }
     }
 

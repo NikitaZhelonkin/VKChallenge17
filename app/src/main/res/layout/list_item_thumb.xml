@@ -6,7 +6,7 @@
     android:layout_width="@dimen/bgItemSize"
     android:layout_height="@dimen/bgItemSize"
     app:riv_corner_radius="4dip"
-    android:background="@drawable/thumb_bg"
+    android:background="@drawable/bg_thumb"
     android:foreground="@drawable/fg_thumb"
     android:layout_margin="6dp"
     android:orientation="vertical"/>
