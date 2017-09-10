@@ -40,6 +40,13 @@ public class AndroidUtils {
         return (int) Math.ceil(dm.density * value);
     }
 
+    public static void  hideKeyboard(View view){
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
     public static Point getDisplaySize(Activity activity) {
         if (sDisplaySize != null) {
             return sDisplaySize;

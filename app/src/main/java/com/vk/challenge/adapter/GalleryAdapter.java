@@ -143,8 +143,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         public void bind(GalleryItem galleryItem, boolean selected) {
             mImageView.setSelected(selected);
-            if (galleryItem.getPath() != null) {
-                Picasso.with(itemView.getContext()).load(galleryItem.getPath())
+            if (galleryItem.getUri() != null) {
+                Picasso.with(itemView.getContext())
+                        .load(galleryItem.getUri())
                         .centerCrop()
                         .transform(new RoundedTransformationBuilder().cornerRadiusDp(4).build())
                         .resizeDimen(R.dimen.gallery_item_approx_size, R.dimen.gallery_item_approx_size)

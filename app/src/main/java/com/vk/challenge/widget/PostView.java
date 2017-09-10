@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -337,10 +338,10 @@ public class PostView extends FrameLayout implements
         mImageView.setImageDrawable(drawable);
     }
 
-    public void setImage(String source) {
+    public void setImage(Uri uri) {
         setBackground(null);
         Picasso.with(getContext())
-                .load(source)
+                .load(uri)
                 .transform(new ResizeTransformation(1024))
                 .into(mImageView);
     }

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -15,12 +16,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -34,6 +33,7 @@ import com.vk.challenge.data.model.GalleryItem;
 import com.vk.challenge.data.model.NewBackgroundItem;
 import com.vk.challenge.data.provider.BackgroundItemsProvider;
 import com.vk.challenge.data.model.FontStyle;
+import com.vk.challenge.utils.AndroidUtils;
 import com.vk.challenge.utils.KeyboardDetector;
 import com.vk.challenge.widget.PostView;
 import com.vk.sdk.VKAccessToken;
@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements
         BackgroundThumbAdapter.OnItemSelectedListener,
         GalleryAdapter.Callback,
         StickerDialogFragment.Callback,
-        KeyboardDetector.Listener{
+        KeyboardDetector.Listener,
+        ImagePicker.Callback{
 
     private static final int PERM_REQ_CODE = 1;
 
@@ -82,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private BackgroundThumbAdapter mThumbsAdapter;
 
+    private ImagePicker mImagePicker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements
         mKeyboardDetector = new KeyboardDetector(this);
         mKeyboardDetector.setKeyboardListener(this);
 
+        mImagePicker = new ImagePicker(this);
+        mImagePicker.setCallback(this);
 
         mEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,12 +139,19 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(!mImagePicker.onActivityResult(requestCode, resultCode, data)){
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERM_REQ_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showGallery();
-            }else{
+            } else {
                 mGalleryWindow.clearSelection();
                 mThumbsAdapter.backSelection();
             }
@@ -209,6 +221,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onImagePicked(Uri uri, boolean fromCamera) {
+        mPostView.setImage(uri);
+    }
+
+    @Override
+    public void onImagePickError(String errorMessage, boolean fromCamera) {
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onItemSelected(BackgroundItem item) {
         if (item instanceof NewBackgroundItem) {
             showGallery();
@@ -225,17 +247,31 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onGalleryItemSelected(GalleryItem galleryItem) {
-        mPostView.setImage(galleryItem.getPath());
+        mPostView.setImage(galleryItem.getUri());
     }
 
     @Override
     public void onTakePhotoClick() {
-        Toast.makeText(this, "Take photo", Toast.LENGTH_SHORT).show();
+        AndroidUtils.hideKeyboard(mEditText);
+        mEditText.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mImagePicker.takePhoto();
+            }
+        }, 150);
+
     }
 
     @Override
     public void onOpenExternalGalleryClick() {
-        Toast.makeText(this, "Open Gallery", Toast.LENGTH_SHORT).show();
+        AndroidUtils.hideKeyboard(mEditText);
+        mEditText.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mImagePicker.pickFromGallery();
+            }
+        }, 150);
+
     }
 
     private void showGallery() {
@@ -299,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements
         return ActivityCompat.shouldShowRequestPermissionRationale(this, permission);
     }
 
-    private void  requestPermission(String permission, int requestCode){
+    private void requestPermission(String permission, int requestCode) {
         ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
     }
 

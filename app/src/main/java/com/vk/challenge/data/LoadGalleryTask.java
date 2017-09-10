@@ -1,6 +1,7 @@
 package com.vk.challenge.data;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.vk.challenge.data.model.GalleryItem;
@@ -40,7 +41,7 @@ public class LoadGalleryTask extends AsyncTask<Void, Void, List<GalleryItem>> {
         return ListUtils.map(photos, new ListUtils.Map<String, GalleryItem>() {
             @Override
             public GalleryItem map(String photo) {
-                return new GalleryItem("file://"+photo);
+                return new GalleryItem(Uri.parse("file://"+photo));
             }
         });
     }
