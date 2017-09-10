@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.vk.challenge.R;
 import com.vk.challenge.data.model.GalleryItem;
@@ -141,7 +142,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ButterKnife.bind(this, itemView);
         }
 
-        public void bind(GalleryItem galleryItem, boolean selected) {
+        public void bind(final GalleryItem galleryItem, boolean selected) {
             mImageView.setSelected(selected);
             if (galleryItem.getUri() != null) {
                 Picasso.with(itemView.getContext())

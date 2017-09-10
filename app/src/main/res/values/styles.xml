@@ -33,7 +33,6 @@
         <item name="android:textColor">@color/colorText</item>
         <item name="android:textColorHint">@color/colorTextHint</item>
         <item name="android:inputType">textMultiLine|textNoSuggestions</item>
-        <item name="android:privateImeOptions">nm</item>
     </style>
 
     <style name="Theme.BottomSheetDialog.Stickers" parent="Theme.Design.Light.BottomSheetDialog"/>
@@ -42,5 +41,16 @@
         <item name="android:windowEnterAnimation">@anim/popup_in</item>
         <item name="android:windowExitAnimation">@anim/popup_out</item>
     </style>
+
+    <style name="Theme.Dialog.Post" parent="@style/ThemeOverlay.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowAnimationStyle">@style/Animation.Dialog.Post</item>
+    </style>
+
+    <style name="Animation.Dialog.Post" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
+    </style>
+
 
 </resources>

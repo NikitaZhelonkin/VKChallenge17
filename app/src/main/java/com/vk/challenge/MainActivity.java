@@ -37,18 +37,10 @@ import com.vk.challenge.utils.AndroidUtils;
 import com.vk.challenge.utils.KeyboardDetector;
 import com.vk.challenge.widget.PostView;
 import com.vk.sdk.VKAccessToken;
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKApiConst;
-import com.vk.sdk.api.VKError;
-import com.vk.sdk.api.VKParameters;
-import com.vk.sdk.api.VKRequest;
-import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.model.VKApiPhoto;
-import com.vk.sdk.api.model.VKAttachments;
-import com.vk.sdk.api.model.VKPhotoArray;
-import com.vk.sdk.api.model.VKWallPostResult;
 import com.vk.sdk.api.photo.VKImageParameters;
 import com.vk.sdk.api.photo.VKUploadImage;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements
         BackgroundThumbAdapter.OnItemSelectedListener,
         GalleryAdapter.Callback,
         StickerDialogFragment.Callback,
+        PostDialogFragment.Callback,
         KeyboardDetector.Listener,
         ImagePicker.Callback{
 
@@ -212,7 +205,23 @@ public class MainActivity extends AppCompatActivity implements
 
     @OnClick(R.id.sendButton)
     public void onSendClick(View v) {
-        loadPhotoToMyWall(mPostView.createBitmap(), null);
+        Bitmap bitmap = mPostView.createBitmap();
+        try {
+            final File file = new VKUploadImage(bitmap, VKImageParameters.jpgImage(0.9f)).getTmpFile();
+            if (file != null) {
+                AndroidUtils.hideKeyboard(mEditText);
+                mEditText.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        post(file);
+                    }
+                }, 150);
+            } else {
+                showError("Unknown Error");
+            }
+        } finally {
+            bitmap.recycle();
+        }
     }
 
     @Override
@@ -272,6 +281,12 @@ public class MainActivity extends AppCompatActivity implements
             }
         }, 150);
 
+    }
+
+    @Override
+    public void onCreateMoreClick() {
+        Toast.makeText(this, "OnMore", Toast.LENGTH_SHORT).show();
+        //TODO reset all
     }
 
     private void showGallery() {
@@ -339,48 +354,12 @@ public class MainActivity extends AppCompatActivity implements
         ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
     }
 
-    private void makePost(VKAttachments att, String msg, final int ownerId) {
-        VKParameters parameters = new VKParameters();
-        parameters.put(VKApiConst.OWNER_ID, String.valueOf(ownerId));
-        parameters.put(VKApiConst.ATTACHMENTS, att);
-        parameters.put(VKApiConst.MESSAGE, msg);
-        VKRequest post = VKApi.wall().post(parameters);
-        post.setModelClass(VKWallPostResult.class);
-        post.executeWithListener(new VKRequest.VKRequestListener() {
-            @Override
-            public void onComplete(VKResponse response) {
-                Toast.makeText(MainActivity.this, "OK", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(VKError error) {
-                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void post(File file){
+        PostDialogFragment.create(file).show(getSupportFragmentManager(), "post");
     }
 
-    private void loadPhotoToMyWall(final Bitmap photo, final String message) {
-        VKRequest request = VKApi.uploadWallPhotoRequest(new VKUploadImage(photo,
-                VKImageParameters.jpgImage(0.9f)), getMyId(), 0);
-        request.executeWithListener(new VKRequest.VKRequestListener() {
-            @Override
-            public void onComplete(VKResponse response) {
-                if (!photo.isRecycled()) {
-                    photo.recycle();
-                }
-                VKApiPhoto photoModel = ((VKPhotoArray) response.parsedModel).get(0);
-                makePost(new VKAttachments(photoModel), message, getMyId());
-            }
-
-            @Override
-            public void onError(VKError error) {
-                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void showError(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
     }
 
-    private int getMyId() {
-        final VKAccessToken vkAccessToken = VKAccessToken.currentToken();
-        return vkAccessToken != null ? Integer.parseInt(vkAccessToken.userId) : 0;
-    }
 }

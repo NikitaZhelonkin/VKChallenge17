@@ -1,7 +1,6 @@
 package com.vk.challenge;
 
 import android.app.Application;
-
 import com.vk.sdk.VKSdk;
 
 /**

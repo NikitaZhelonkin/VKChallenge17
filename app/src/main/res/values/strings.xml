@@ -9,4 +9,8 @@
 
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_create">Создать еще</string>
+
+    <string name="posting">Публикация…</string>
+    <string name="posting_success">Опубликовано!</string>
 </resources>
