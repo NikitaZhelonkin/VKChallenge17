@@ -1,11 +1,13 @@
 package com.vk.challenge.widget;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import com.vk.challenge.R;
 
 /**
  * Created by nikita on 10.09.17.
@@ -13,37 +15,58 @@ import android.widget.TextView;
 
 public class TabLayout extends android.support.design.widget.TabLayout {
 
+    private int mCustomViewResId;
+
     public TabLayout(Context context) {
         super(context);
-        init(context);
+        init(context, null);
     }
 
     public TabLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init(context, attrs);
     }
 
     public TabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init(context, attrs);
     }
 
-    private void init(Context context){
+    private void init(Context context, AttributeSet attrs) {
         setScaleY(-1);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TabLayout);
+        mCustomViewResId = a.getResourceId(R.styleable.TabLayout_customView, -1);
+        a.recycle();
     }
 
     @Override
     public void addTab(@NonNull Tab tab) {
         super.addTab(tab);
-        getTabTextView(tab.getPosition()).setScaleY(-1);
+        View tabView = getTabView(tab.getPosition());
+        if (tabView != null) {
+            tabView.setScaleY(-1);
+        }
     }
 
-    private LinearLayout tabStrip(){
-        return (LinearLayout)getChildAt(0);
+    @NonNull
+    @Override
+    public Tab newTab() {
+        if (mCustomViewResId != -1) {
+            return super.newTab().setCustomView(mCustomViewResId);
+        } else {
+            return super.newTab();
+        }
     }
 
-    TextView getTabTextView(int position){
-       return (TextView) ((ViewGroup)((ViewGroup)getChildAt(0)).getChildAt(position)).getChildAt(1);
+    View getTabView(int position) {
+        Tab tab = getTabAt(position);
+        if (tab == null) {
+            return null;
+        }
+        if (tab.getCustomView() != null) {
+            return tab.getCustomView();
+        }
+        return ((ViewGroup) ((ViewGroup) getChildAt(0)).getChildAt(position)).getChildAt(1);
     }
 
 }

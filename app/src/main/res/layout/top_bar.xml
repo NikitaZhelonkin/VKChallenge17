@@ -20,11 +20,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         app:tabGravity="center"
-        app:tabMaxWidth="83dp"
-        app:tabMinWidth="83dp"
+        app:tabMaxWidth="92dp"
+        app:tabMinWidth="0dp"
         app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/cornflower_blue_two"
-        app:tabTextColor="@color/cornflower_blue_two72"/>
+        app:customView="@layout/tab_view"/>
 
     <ImageButton
         android:id="@+id/action_sticker_btn"

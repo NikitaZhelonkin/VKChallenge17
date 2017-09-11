@@ -200,7 +200,7 @@ public class PostView extends FrameLayout implements
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (mMode == MODE_POST) {
             if (getMeasuredHeight() != 0) {
-                mPostHeight = calculatePostHeight();
+                mPostHeight = Math.min(calculatePostHeight(), getMeasuredWidth());
             }
             if (mPostHeight != 0) {
                 super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(mPostHeight, MeasureSpec.EXACTLY));

@@ -6,6 +6,6 @@
     <dimen name="bgItemSize">32dp</dimen>
     <dimen name="stickerItemSize">78dp</dimen>
     <dimen name="stickerBottomSheetHeight">384dp</dimen>
-    <dimen name="keyboard_height">249dip</dimen>
+    <dimen name="keyboard_height">200dip</dimen>
     <dimen name="gallery_item_approx_size">125dp</dimen>
 </resources>

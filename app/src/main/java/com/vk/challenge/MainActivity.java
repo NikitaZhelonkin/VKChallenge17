@@ -11,14 +11,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
-import android.support.transition.ChangeBounds;
-import android.support.transition.TransitionManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -30,6 +29,8 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.transitionseverywhere.ChangeBounds;
+import com.transitionseverywhere.TransitionManager;
 import com.vk.challenge.adapter.BackgroundThumbAdapter;
 import com.vk.challenge.adapter.GalleryAdapter;
 import com.vk.challenge.data.model.BackgroundItem;
@@ -40,7 +41,7 @@ import com.vk.challenge.data.model.FontStyle;
 import com.vk.challenge.utils.AndroidUtils;
 import com.vk.challenge.utils.KeyboardDetector;
 import com.vk.challenge.widget.PostView;
-import com.vk.sdk.VKAccessToken;
+import com.vk.challenge.widget.ThumbsLayoutManager;
 import com.vk.sdk.api.photo.VKImageParameters;
 import com.vk.sdk.api.photo.VKUploadImage;
 
@@ -139,13 +140,14 @@ public class MainActivity extends AppCompatActivity implements
         mThumbsAdapter = new BackgroundThumbAdapter();
         mThumbsAdapter.setOnItemSelectedListener(this);
         mThumbsAdapter.setItems(BackgroundItemsProvider.getItems(this));
-        mThumbsAdapter.selectItem(0);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new ThumbsLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mThumbsAdapter);
         mRecyclerView.setItemAnimator(null);
+        mRecyclerView.setAdapter(mThumbsAdapter);
 
+
+        mThumbsAdapter.selectItem(0);
     }
 
     @Override
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements
             }
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    mKeyboardDetector.getKeyboardHeight());
+                    KeyboardDetector.getKeyboardHeight());
             mGalleryCover.setLayoutParams(params);
         } else {
             hideGallery();
@@ -279,7 +281,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onItemSelected(BackgroundItem item) {
+    public void onItemSelected(BackgroundItem item, int position) {
+        mRecyclerView.smoothScrollToPosition(position);
         if (item instanceof NewBackgroundItem) {
             showGallery();
         } else {
@@ -333,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
         mGalleryWindow.load();
-        mGalleryWindow.setHeight((mKeyboardDetector.getKeyboardHeight()));
+        mGalleryWindow.setHeight((KeyboardDetector.getKeyboardHeight()));
         if (mKeyboardDetector.isKeyboardVisible()) {
             mGalleryCover.setVisibility(LinearLayout.GONE);
         } else {

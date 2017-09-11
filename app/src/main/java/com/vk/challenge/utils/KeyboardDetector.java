@@ -6,6 +6,8 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
+import com.vk.challenge.R;
+
 /**
  * Created by nikita on 08.09.17.
  */
@@ -18,7 +20,7 @@ public class KeyboardDetector {
 
     private Listener mListener;
 
-    private static int mKeyboardHeight;
+    private static int keyboardHeight;
 
     private int mLastHeight = 0;
 
@@ -39,6 +41,7 @@ public class KeyboardDetector {
 
             }
         });
+        keyboardHeight = mContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
     }
 
     public void setKeyboardListener(Listener listener) {
@@ -49,7 +52,7 @@ public class KeyboardDetector {
         int heightDiff = calculateKeyboardHeight(rootView);
         if (heightDiff > AndroidUtils.dpToPx(mContext, 200)) {
             mIsKeyboardVisible = true;
-            mKeyboardHeight = heightDiff;
+            keyboardHeight = heightDiff;
         }else{
             mIsKeyboardVisible = false;
         }
@@ -59,7 +62,7 @@ public class KeyboardDetector {
     }
 
     public static int getKeyboardHeight() {
-        return mKeyboardHeight;
+        return keyboardHeight;
     }
 
     public boolean isKeyboardVisible() {

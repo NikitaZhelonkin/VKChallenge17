@@ -24,7 +24,7 @@ import butterknife.OnClick;
 public class BackgroundThumbAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public interface OnItemSelectedListener {
-        void onItemSelected(BackgroundItem item);
+        void onItemSelected(BackgroundItem item, int position);
     }
 
     private List<BackgroundItem> mData;
@@ -41,7 +41,7 @@ public class BackgroundThumbAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     public void selectItem(int position) {
         if (mOnItemSelectedListener != null) {
-            mOnItemSelectedListener.onItemSelected(mData.get(position));
+            mOnItemSelectedListener.onItemSelected(mData.get(position), position);
         }
         mLastSelectedPosition = mSelectedPosition;
         mSelectedPosition = position;

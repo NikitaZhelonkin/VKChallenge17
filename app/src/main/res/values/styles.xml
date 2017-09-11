@@ -4,9 +4,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorButtonNormal">@color/colorAccent</item>
         <item name="android:windowBackground">@color/colorBackground</item>
-        <item name="android:buttonStyle">@style/Button</item>
+        <item name="buttonStyle">@style/Button</item>
     </style>
 
     <style name="AppTheme.Login">
@@ -51,6 +50,12 @@
         <item name="android:windowEnterAnimation">@anim/fade_in</item>
         <item name="android:windowExitAnimation">@anim/fade_out</item>
     </style>
+
+    <style name="Widget.TabText" parent="Widget.AppCompat.ActionBar.TabText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/tab_text_color</item>
+    </style>
+
 
 
 
