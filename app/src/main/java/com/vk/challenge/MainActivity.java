@@ -42,6 +42,7 @@ import com.vk.challenge.utils.AndroidUtils;
 import com.vk.challenge.utils.KeyboardDetector;
 import com.vk.challenge.widget.PostView;
 import com.vk.challenge.widget.ThumbsLayoutManager;
+import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.api.photo.VKImageParameters;
 import com.vk.sdk.api.photo.VKUploadImage;
 
