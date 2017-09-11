@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -17,7 +16,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -67,6 +65,18 @@ public class MainActivity extends AppCompatActivity implements
     private static final int TAB_POST = 0;
     private static final int TAB_HISTORY = 1;
 
+    private static final FontStyle[] IMAGE_FONTS = {
+            FontStyle.DEFAULT_IMAGE,
+            FontStyle.LIGHT_IMAGE,
+            FontStyle.DARK_IMAGE,
+    };
+
+    private static final FontStyle[] BLANK_FONTS = {
+            FontStyle.DEFAULT_BLANK,
+            FontStyle.LIGHT_BLANK,
+            FontStyle.DARK_BLANK,
+    };
+
     @BindView(R.id.root_layout)
     ViewGroup mRootLayout;
     @BindView(R.id.content_layout)
@@ -91,6 +101,10 @@ public class MainActivity extends AppCompatActivity implements
     private BackgroundThumbAdapter mThumbsAdapter;
 
     private ImagePicker mImagePicker;
+
+    private int mCurrentFontStyleIdx;
+
+    private FontStyle[] mCurrentFonts = BLANK_FONTS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -233,11 +247,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @OnClick(R.id.action_font_btn)
     public void onFontClick(View v) {
-        if (mPostView.getFontStyle() == FontStyle.LIGHT) {
-            mPostView.setFontStyle(FontStyle.DARK);
-        } else {
-            mPostView.setFontStyle(FontStyle.LIGHT);
-        }
+        mCurrentFontStyleIdx = (mCurrentFontStyleIdx + 1) % 3;
+        mPostView.setFontStyle(mCurrentFonts[mCurrentFontStyleIdx]);
     }
 
     @OnClick(R.id.action_sticker_btn)
@@ -289,17 +300,21 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             hideGallery();
             mPostView.setImage(item.getDrawable());
-            mPostView.setFontStyle(item.getFontStyle());
+
             mGalleryWindow.clearSelection();
         }
         boolean white = item.getDrawable() instanceof ColorDrawable &&
                 ((ColorDrawable) item.getDrawable()).getColor() == Color.WHITE;
         mPostView.setTrashWithBorder(white);
+        mCurrentFonts = white ? BLANK_FONTS : IMAGE_FONTS;
+        mPostView.setFontStyle(mCurrentFonts[mCurrentFontStyleIdx]);
     }
 
     @Override
     public void onGalleryItemSelected(GalleryItem galleryItem) {
         mPostView.setImage(galleryItem.getUri());
+        mCurrentFonts = IMAGE_FONTS;
+        mPostView.setFontStyle(mCurrentFonts[mCurrentFontStyleIdx]);
     }
 
     @Override

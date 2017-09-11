@@ -12,6 +12,6 @@ import com.vk.challenge.R;
 public class NewBackgroundItem extends BackgroundItem {
 
     public NewBackgroundItem() {
-        super(R.drawable.ic_toolbar_new, null, new FontStyle(Color.WHITE, true));
+        super(R.drawable.ic_toolbar_new, null);
     }
 }
