@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
              android:layout_height="@dimen/topBarHeight"
+             android:background="@color/white92"
              android:orientation="vertical">
 
     <ImageButton
-        android:contentDescription="@null"
         android:id="@+id/action_font_btn"
         android:layout_width="@dimen/topBarHeight"
         android:layout_height="@dimen/topBarHeight"
         android:background="?selectableItemBackground"
+        android:contentDescription="@null"
         android:src="@drawable/ic_toolbar_font"/>
 
+    <com.vk.challenge.widget.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:tabGravity="center"
+        app:tabMaxWidth="83dp"
+        app:tabMinWidth="83dp"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="@color/cornflower_blue_two"
+        app:tabTextColor="@color/cornflower_blue_two72"/>
+
     <ImageButton
-        android:contentDescription="@null"
         android:id="@+id/action_sticker_btn"
         android:layout_width="@dimen/topBarHeight"
         android:layout_height="@dimen/topBarHeight"
         android:layout_gravity="right"
         android:background="?selectableItemBackground"
+        android:contentDescription="@null"
         android:src="@drawable/ic_toolbar_sticker"/>
 
 

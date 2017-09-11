@@ -2,8 +2,10 @@ package com.vk.challenge.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,13 +22,13 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.squareup.picasso.Picasso;
 import com.vk.challenge.utils.AndroidUtils;
+import com.vk.challenge.utils.KeyboardDetector;
 import com.vk.challenge.utils.MathUtils;
 import com.vk.challenge.R;
 import com.vk.challenge.data.model.FontStyle;
@@ -44,7 +46,10 @@ public class PostView extends FrameLayout implements
         RotationGestureDetector.OnRotationGestureListener,
         StickerView.OnMoveListener {
 
-    private int mMaxHeight;
+    public static final int MODE_POST = 0;
+    public static final int MODE_HISTORY = 1;
+
+    private int mPostHeight;
 
     private ImageView mImageView;
     private FontBackgroundEditText mEditText;
@@ -66,10 +71,7 @@ public class PostView extends FrameLayout implements
 
     private boolean mAnimatingTrashHide;
 
-    public PostView(@NonNull Context context) {
-        super(context);
-        init(context);
-    }
+    private int mMode;
 
     public PostView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -84,6 +86,7 @@ public class PostView extends FrameLayout implements
     private void init(Context context) {
         mScaleGestureDetector = new ScaleGestureDetector(context, this);
         mRotationGestureDetector = new RotationGestureDetector(this);
+        setMode(MODE_POST, false);
     }
 
     @Override
@@ -102,6 +105,15 @@ public class PostView extends FrameLayout implements
         int shadowColor = fontStyle.isShadow() ? Color.parseColor("#1e000000") : 0;
         mEditText.setShadowLayer(shadowRadius, 0, shadowDy, shadowColor);
         mFontStyle = fontStyle;
+    }
+
+    public void setMode(int mode, boolean animate) {
+        mMode = mode;
+        Resources res = getContext().getResources();
+        int topPadding = mMode == MODE_POST ? res.getDimensionPixelSize(R.dimen.topBarHeight) : 0;
+        int botPadding = mMode == MODE_POST ? res.getDimensionPixelSize(R.dimen.bottomBarHeight) : 0;
+        setPadding(0, topPadding, 0, botPadding);
+        requestLayout();
     }
 
     public FontStyle getFontStyle() {
@@ -186,12 +198,22 @@ public class PostView extends FrameLayout implements
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if (getMeasuredHeight() != 0) {
-            mMaxHeight = mMaxHeight == 0 ? getMeasuredHeight() : Math.min(getMeasuredHeight(), mMaxHeight);
+        if (mMode == MODE_POST) {
+            if (getMeasuredHeight() != 0) {
+                mPostHeight = calculatePostHeight();
+            }
+            if (mPostHeight != 0) {
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(mPostHeight, MeasureSpec.EXACTLY));
+            }
         }
-        if (mMaxHeight != 0) {
-            super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(mMaxHeight, MeasureSpec.EXACTLY));
-        }
+    }
+
+    private int calculatePostHeight() {
+        Rect rect = new Rect();
+        getRootView().getWindowVisibleDisplayFrame(rect);
+        int statusBarHeight = rect.top;
+        return AndroidUtils.getDisplaySize((Activity) getContext()).y -
+                statusBarHeight - KeyboardDetector.getKeyboardHeight();
     }
 
     @Override

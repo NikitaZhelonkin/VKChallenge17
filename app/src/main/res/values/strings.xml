@@ -13,4 +13,6 @@
 
     <string name="posting">Публикация…</string>
     <string name="posting_success">Опубликовано!</string>
+    <string name="tab_post">Запись</string>
+    <string name="tab_history">История</string>
 </resources>

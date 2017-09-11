@@ -8,7 +8,11 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.transition.ChangeBounds;
+import android.support.transition.TransitionManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -53,12 +57,18 @@ public class MainActivity extends AppCompatActivity implements
         StickerDialogFragment.Callback,
         PostDialogFragment.Callback,
         KeyboardDetector.Listener,
-        ImagePicker.Callback{
+        ImagePicker.Callback,
+        TabLayout.OnTabSelectedListener {
 
     private static final int PERM_REQ_CODE = 1;
 
+    private static final int TAB_POST = 0;
+    private static final int TAB_HISTORY = 1;
+
     @BindView(R.id.root_layout)
-    View mRootLayout;
+    ViewGroup mRootLayout;
+    @BindView(R.id.content_layout)
+    ViewGroup mContentLayout;
     @BindView(R.id.post_view)
     PostView mPostView;
     @BindView(R.id.post_edit_text)
@@ -69,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements
     RecyclerView mRecyclerView;
     @BindView(R.id.gallery_cover)
     View mGalleryCover;
+    @BindView(R.id.tabLayout)
+    TabLayout mTabLayout;
 
     private GalleryWindow mGalleryWindow;
 
@@ -91,6 +103,10 @@ public class MainActivity extends AppCompatActivity implements
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.tab_post));
+        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.tab_history));
+        mTabLayout.addOnTabSelectedListener(this);
 
         mKeyboardDetector = new KeyboardDetector(this);
         mKeyboardDetector.setKeyboardListener(this);
@@ -129,11 +145,12 @@ public class MainActivity extends AppCompatActivity implements
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mThumbsAdapter);
         mRecyclerView.setItemAnimator(null);
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(!mImagePicker.onActivityResult(requestCode, resultCode, data)){
+        if (!mImagePicker.onActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -187,6 +204,28 @@ public class MainActivity extends AppCompatActivity implements
     @OnTextChanged(R.id.post_edit_text)
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         mButton.setEnabled(s.length() != 0);
+    }
+
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        TransitionManager.beginDelayedTransition(mContentLayout, new ChangeBounds());
+        if (tab.getPosition() == TAB_POST) {
+            mPostView.setMode(PostView.MODE_POST, true);
+        } else if (tab.getPosition() == TAB_HISTORY) {
+            mPostView.setMode(PostView.MODE_HISTORY, true);
+        } else {
+            throw new IllegalArgumentException("Unsupported tab position");
+        }
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+        //Do nothing
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
+        //Do nothing
     }
 
     @OnClick(R.id.action_font_btn)
@@ -354,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements
         ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
     }
 
-    private void post(File file){
+    private void post(File file) {
         PostDialogFragment.create(file).show(getSupportFragmentManager(), "post");
     }
 

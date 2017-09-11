@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout
     android:id="@+id/root_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.vk.challenge.MainActivity">
+    android:orientation="vertical">
 
-    <include layout="@layout/top_bar"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/colorDivider"/>
 
     <FrameLayout
+        android:id="@+id/content_layout"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        tools:context="com.vk.challenge.MainActivity">
 
         <com.vk.challenge.widget.PostView
             android:id="@+id/post_view"
@@ -30,11 +25,11 @@
             android:clipChildren="false">
 
             <ImageView
-                android:contentDescription="@null"
                 android:id="@+id/post_image_view"
                 android:layout_width="match_parent"
-                android:scaleType="centerCrop"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"/>
 
             <com.vk.challenge.widget.FontBackgroundEditText
                 android:id="@+id/post_edit_text"
@@ -52,31 +47,52 @@
                 android:layout_height="48dp"
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_margin="16dp"
+                android:background="@drawable/bg_trash"
                 android:contentDescription="@null"
+                android:elevation="1dp"
                 android:src="@drawable/ic_fab_trash_selector"
                 android:visibility="invisible"
-                android:elevation="1dp"
-                android:background="@drawable/bg_trash"
                 tools:ignore="UnusedAttribute"/>
 
         </com.vk.challenge.widget.PostView>
 
 
+        <LinearLayout
+            android:id="@+id/panels_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include layout="@layout/top_bar"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorDivider"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorDivider"/>
+
+            <include layout="@layout/bottom_bar"/>
+
+
+        </LinearLayout>
+
     </FrameLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/colorDivider"/>
-
-    <include layout="@layout/bottom_bar"/>
 
     <FrameLayout
         android:id="@+id/gallery_cover"
         android:layout_width="match_parent"
         android:layout_height="@dimen/keyboard_height"
         android:background="@android:color/transparent"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
 </LinearLayout>
 

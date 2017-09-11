@@ -18,7 +18,7 @@ public class KeyboardDetector {
 
     private Listener mListener;
 
-    private int mKeyboardHeight;
+    private static int mKeyboardHeight;
 
     private int mLastHeight = 0;
 
@@ -58,7 +58,7 @@ public class KeyboardDetector {
         }
     }
 
-    public int getKeyboardHeight() {
+    public static int getKeyboardHeight() {
         return mKeyboardHeight;
     }
 
