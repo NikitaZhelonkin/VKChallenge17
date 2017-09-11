@@ -82,6 +82,7 @@ public class ImagePicker {
             if (requestCode == CAMERA_REQ_CODE) {
                 galleryAddPic(sCurrentPhotoPath);
                 notifyPicked(sCurrentPhotoUri, true);
+                return true;
             } else if (requestCode == GALLERY_REQ_CODE) {
                 Uri selectedImageUri = data.getData();
                 if (selectedImageUri != null) {
@@ -89,6 +90,7 @@ public class ImagePicker {
                 } else {
                     notifyError("Error: Image is null", false);
                 }
+                return false;
             }
         }
         return false;

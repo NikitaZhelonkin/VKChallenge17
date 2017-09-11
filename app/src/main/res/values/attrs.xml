@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <declare-styleable name="PostView">
+        <attr name="postTopInset" format="dimension"/>
+        <attr name="postBottomInset" format="dimension"/>
+
+    </declare-styleable>
     <declare-styleable name="TabLayout">
         <attr name="customView" format="reference"/>
     </declare-styleable>

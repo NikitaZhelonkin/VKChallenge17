@@ -34,7 +34,7 @@ public class KeyboardDetector {
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if (mLastHeight != rootView.getHeight()) {
+                if (Math.abs(mLastHeight - rootView.getHeight()) > AndroidUtils.dpToPx(mContext, 100)) {
                     onSizeChanged(rootView);
                     mLastHeight = rootView.getHeight();
                 }

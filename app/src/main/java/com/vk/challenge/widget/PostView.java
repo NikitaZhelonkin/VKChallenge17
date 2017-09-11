@@ -6,6 +6,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -55,8 +56,6 @@ public class PostView extends FrameLayout implements
     private FontBackgroundEditText mEditText;
     private ImageView mTrashView;
 
-    private FontStyle mFontStyle;
-
     private List<StickerView> mStickers = new ArrayList<>();
 
     private float mLastScale;
@@ -73,20 +72,29 @@ public class PostView extends FrameLayout implements
 
     private int mMode;
 
+    private int mPostTopInset;
+    private int mPostBottomInset;
+
     public PostView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init(context, attrs);
     }
 
     public PostView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init(context, attrs);
     }
 
-    private void init(Context context) {
+    private void init(Context context, AttributeSet attrs) {
         mScaleGestureDetector = new ScaleGestureDetector(context, this);
         mRotationGestureDetector = new RotationGestureDetector(this);
-        setMode(MODE_POST, false);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PostView);
+        mPostTopInset = a.getDimensionPixelSize(R.styleable.PostView_postTopInset, 0);
+        mPostBottomInset = a.getDimensionPixelSize(R.styleable.PostView_postBottomInset, 0);
+        a.recycle();
+
+        setMode(MODE_POST);
     }
 
     @Override
@@ -104,20 +112,18 @@ public class PostView extends FrameLayout implements
         int shadowDy = fontStyle.isShadow() ? 2 : 0;
         int shadowColor = fontStyle.isShadow() ? Color.parseColor("#1e000000") : 0;
         mEditText.setShadowLayer(shadowRadius, 0, shadowDy, shadowColor);
-        mFontStyle = fontStyle;
     }
 
-    public void setMode(int mode, boolean animate) {
+    public void setMode(int mode) {
         mMode = mode;
-        Resources res = getContext().getResources();
-        int topPadding = mMode == MODE_POST ? res.getDimensionPixelSize(R.dimen.topBarHeight) : 0;
-        int botPadding = mMode == MODE_POST ? res.getDimensionPixelSize(R.dimen.bottomBarHeight) : 0;
-        setPadding(0, topPadding, 0, botPadding);
+        if (mMode == MODE_POST) {
+            int insetDiff = Math.abs(mPostBottomInset - mPostTopInset);
+            setPadding(0, mPostTopInset > mPostBottomInset ? insetDiff : 0, 0,
+                    mPostBottomInset > mPostTopInset ? insetDiff : 0);
+        } else {
+            setPadding(0, 0, 0, 0);
+        }
         requestLayout();
-    }
-
-    public FontStyle getFontStyle() {
-        return mFontStyle;
     }
 
     public Bitmap createBitmap() {
@@ -130,9 +136,9 @@ public class PostView extends FrameLayout implements
     }
 
     public void setTrashWithBorder(boolean border) {
-        if(border){
+        if (border) {
             mTrashView.setBackgroundResource(R.drawable.bg_trash_with_border);
-        }else{
+        } else {
             mTrashView.setBackgroundResource(R.drawable.bg_trash);
         }
     }
@@ -210,10 +216,11 @@ public class PostView extends FrameLayout implements
 
     private int calculatePostHeight() {
         Rect rect = new Rect();
+        int insetDiff = Math.abs(mPostBottomInset - mPostTopInset);
         getRootView().getWindowVisibleDisplayFrame(rect);
         int statusBarHeight = rect.top;
         return AndroidUtils.getDisplaySize((Activity) getContext()).y -
-                statusBarHeight - KeyboardDetector.getKeyboardHeight();
+                statusBarHeight - KeyboardDetector.getKeyboardHeight() - mPostBottomInset - mPostTopInset + insetDiff;
     }
 
     @Override

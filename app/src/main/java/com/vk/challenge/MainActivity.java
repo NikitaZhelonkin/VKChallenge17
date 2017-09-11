@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -41,6 +42,7 @@ import com.vk.challenge.utils.KeyboardDetector;
 import com.vk.challenge.widget.PostView;
 import com.vk.challenge.widget.ThumbsLayoutManager;
 import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.photo.VKImageParameters;
 import com.vk.sdk.api.photo.VKUploadImage;
 
@@ -213,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     KeyboardDetector.getKeyboardHeight());
             mGalleryCover.setLayoutParams(params);
+            mPostView.requestLayout();
         } else {
             hideGallery();
         }
@@ -227,9 +230,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onTabSelected(TabLayout.Tab tab) {
         TransitionManager.beginDelayedTransition(mContentLayout, new ChangeBounds());
         if (tab.getPosition() == TAB_POST) {
-            mPostView.setMode(PostView.MODE_POST, true);
+            mPostView.setMode(PostView.MODE_POST);
         } else if (tab.getPosition() == TAB_HISTORY) {
-            mPostView.setMode(PostView.MODE_HISTORY, true);
+            mPostView.setMode(PostView.MODE_HISTORY);
         } else {
             throw new IllegalArgumentException("Unsupported tab position");
         }
@@ -284,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onImagePicked(Uri uri, boolean fromCamera) {
+        mGalleryWindow.clearSelection();
         mPostView.setImage(uri);
     }
 
