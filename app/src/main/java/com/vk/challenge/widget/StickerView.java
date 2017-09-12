@@ -67,9 +67,6 @@ public class StickerView extends AppCompatImageView {
             case MotionEvent.ACTION_DOWN:
                 mDownX = x;
                 mDownY = y;
-                if (mOnMoveListener != null) {
-                    mOnMoveListener.onStartMove(this);
-                }
                 return true;
             case MotionEvent.ACTION_MOVE:
                 float deltaX = x - mDownX;
@@ -79,6 +76,9 @@ public class StickerView extends AppCompatImageView {
                     mDragging = true;
                     deltaX = 0;
                     deltaY = 0;
+                    if (mOnMoveListener != null) {
+                        mOnMoveListener.onStartMove(this);
+                    }
                 }
                 if (mDragging) {
                     mPosition.offset((int) deltaX, (int) deltaY);

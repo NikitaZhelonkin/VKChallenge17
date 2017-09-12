@@ -14,6 +14,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -74,6 +76,8 @@ public class PostView extends FrameLayout implements
 
     private int mPostTopInset;
     private int mPostBottomInset;
+
+    private Handler mHandler = new Handler(Looper.getMainLooper());
 
     public PostView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -239,19 +243,19 @@ public class PostView extends FrameLayout implements
     @Override
     public void onStartMove(StickerView stickerView) {
         bringStickerToFront(stickerView);
+        mHandler.postDelayed(mShowTrashRunnable, 500);
     }
 
     @Override
     public void onMove(StickerView stickerView) {
         int deleteDistance = AndroidUtils.dpToPx(getContext(), 48);
-        int showTrashDistance = AndroidUtils.dpToPx(getContext(), 96);
 
         Point stickerPoint = getChildMidPoint(stickerView);
         Point trashPoint = getChildMidPoint(mTrashView);
 
         int distance = MathUtils.distanceBetween(stickerPoint, trashPoint);
 
-        if (distance <= deleteDistance) {
+        if (distance <= deleteDistance && isTrashVisible()) {
             showTrash();
             setTrashActive(true);
             setStickerToDelete(stickerView);
@@ -259,13 +263,8 @@ public class PostView extends FrameLayout implements
             stickerView.setAlpha(distance / (float) deleteDistance);
             stickerView.setScaleX(scale * distance / (float) deleteDistance);
             stickerView.setScaleY(scale * distance / (float) deleteDistance);
-
-        } else if (distance < showTrashDistance) {
-            showTrash();
+        }  else {
             setTrashActive(false);
-            setStickerToDelete(null);
-        } else {
-            hideTrash();
             setStickerToDelete(null);
         }
     }
@@ -298,8 +297,8 @@ public class PostView extends FrameLayout implements
             mStickerToDelete = null;
         }
         hideTrash();
+        mHandler.removeCallbacks(mShowTrashRunnable);
     }
-
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -426,6 +425,14 @@ public class PostView extends FrameLayout implements
         return new Random().nextInt(90) - 45;
     }
 
+    private Runnable mShowTrashRunnable =new Runnable() {
+        @Override
+        public void run() {
+            showTrash();
+            setTrashActive(false);
+        }
+    };
+
     private void showTrash() {
         if (mTrashView.getVisibility() == View.VISIBLE) {
             return;
@@ -440,6 +447,10 @@ public class PostView extends FrameLayout implements
                 .setListener(null)
                 .setDuration(300)
                 .start();
+    }
+
+    private boolean isTrashVisible(){
+        return mTrashView.getVisibility() == View.VISIBLE;
     }
 
     private void hideTrash() {
