@@ -48,7 +48,7 @@ public class AndroidUtils {
     }
 
     public static Point getDisplaySize(Activity activity) {
-        if (sDisplaySize != null) {
+        if (sDisplaySize != null && sDisplaySize.x != 0 && sDisplaySize.y != 0) {
             return sDisplaySize;
         }
         Display display = activity.getWindowManager().getDefaultDisplay();

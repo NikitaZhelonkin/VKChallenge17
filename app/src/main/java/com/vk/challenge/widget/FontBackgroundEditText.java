@@ -3,6 +3,7 @@ package com.vk.challenge.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -11,13 +12,19 @@ import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 
+import com.vk.challenge.utils.AndroidUtils;
+
 /**
  * Created by nikita on 07.09.17.
  */
 
 public class FontBackgroundEditText extends TFEditText {
 
-    private static final int STROKE_WIDTH = 8;//dp
+    private static final int CORNER_RADIUS = 4;//dp
+
+    private static final int PADDING_HORIZONTAL = 9;//dp
+    private static final int PADDING_TOP = 2;//dp
+    private static final int PADDING_BOT = 6;//dp
 
     private int mBgColor = Color.TRANSPARENT;
 
@@ -26,6 +33,10 @@ public class FontBackgroundEditText extends TFEditText {
     private Path mBgPath;
 
     private RectF mLineBounds = new RectF();
+
+    private int mPaddingHorizontal;
+    private int mPaddingTop;
+    private int mPaddingBot;
 
     public FontBackgroundEditText(Context context) {
         super(context);
@@ -46,12 +57,11 @@ public class FontBackgroundEditText extends TFEditText {
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         mBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mBgPaint.setDither(true);
-        mBgPaint.setStrokeWidth((int) (dm.density * STROKE_WIDTH));
-        mBgPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mBgPaint.setStrokeJoin(Paint.Join.ROUND);
-        mBgPaint.setStrokeCap(Paint.Cap.ROUND);
+        mBgPaint.setPathEffect(new CornerPathEffect(dm.density * CORNER_RADIUS));
         mBgPath = new Path();
-
+        mPaddingHorizontal = (int) (dm.density * PADDING_HORIZONTAL);
+        mPaddingTop = (int) (dm.density * PADDING_TOP);
+        mPaddingBot = (int) (dm.density * PADDING_BOT);
     }
 
     public void setFontBackgroundColor(int color) {
@@ -93,17 +103,20 @@ public class FontBackgroundEditText extends TFEditText {
             mBgPath.lineTo(lineBounds.left, lineBounds.bottom);
             mBgPath.lineTo(lineBounds.left, lineBounds.top);
         }
-
+        mBgPath.close();
         canvas.drawPath(mBgPath, mBgPaint);
     }
 
     private RectF getLineBounds(int line) {
-        float left = getLayout().getLineLeft(line) - getLineSpacingExtra();
-        float right = getLayout().getLineRight(line) + getLineSpacingExtra();
+        float left = getLayout().getLineLeft(line) - mPaddingHorizontal;
+        float right = getLayout().getLineRight(line) + mPaddingHorizontal;
         float top = getLayout().getLineTop(line);
         float bot = getLayout().getLineBottom(line);
         if (line == 0) {
-            top += getPaddingTop();
+            top -= mPaddingTop;
+        }
+        if (line == getLayout().getLineCount() - 1) {
+            bot += mPaddingBot;
         }
         mLineBounds.set(left, top, right, bot);
         return mLineBounds;
