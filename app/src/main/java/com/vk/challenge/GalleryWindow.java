@@ -73,6 +73,10 @@ public class GalleryWindow extends PopupWindow implements
         }
     }
 
+    public void addAndSelect(GalleryItem galleryItem){
+        mGalleryAdapter.addAndSelect(galleryItem);
+    }
+
     public void clearSelection(){
         mGalleryAdapter.selectItem(RecyclerView.NO_POSITION, false);
     }
@@ -94,6 +98,11 @@ public class GalleryWindow extends PopupWindow implements
     @Override
     public void showAtLocation(View parent, int gravity, int x, int y) {
         super.showAtLocation(parent, gravity, x, y);
+        int selectPosition = mGalleryAdapter.getSelectedPosition() != RecyclerView.NO_POSITION ?
+                mGalleryAdapter.getSelectedPosition() : 1;
+        if (selectPosition < mGalleryAdapter.getItemCount()) {
+            mGalleryAdapter.selectItem(selectPosition, true);
+        }
     }
 
     private void cancelLoading() {

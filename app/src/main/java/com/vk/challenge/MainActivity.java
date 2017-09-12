@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERM_REQ_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showGallery();
+                showGallery(true);
             } else {
                 mGalleryWindow.clearSelection();
                 mThumbsAdapter.backSelection();
@@ -288,10 +288,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onImagePicked(Uri uri, boolean fromCamera) {
         if(!isGalleryVisible()){
-            showGallery();
+            showGallery(false);
         }
-        mGalleryWindow.clearSelection();
-        mPostView.setImage(uri);
+        mGalleryWindow.addAndSelect(new GalleryItem(uri));
     }
 
     @Override
@@ -302,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onImagePickCancel() {
         if(!isGalleryVisible()){
-            showGallery();
+            showGallery(false);
         }
     }
 
@@ -312,10 +311,9 @@ public class MainActivity extends AppCompatActivity implements
                 ((ColorDrawable) item.getDrawable()).getColor() == Color.WHITE;
         mPostView.setTrashWithBorder(white);
         if (item instanceof NewBackgroundItem) {
-            showGallery();
+            showGallery(false);
         } else {
             hideGallery();
-            mGalleryWindow.clearSelection();
             mPostView.setImage(item.getDrawable());
             mCurrentFonts = white ? BLANK_FONTS : IMAGE_FONTS;
             mPostView.setFontStyle(mCurrentFonts[mCurrentFontStyleIdx]);
@@ -360,11 +358,13 @@ public class MainActivity extends AppCompatActivity implements
         //TODO reset all
     }
 
-    private void showGallery() {
+    private void showGallery(boolean load) {
         if (!requestMediaPermission()) {
             return;
         }
-        mGalleryWindow.load();
+        if (load) {
+            mGalleryWindow.load();
+        }
         mGalleryWindow.setHeight((KeyboardDetector.getKeyboardHeight()));
         if (mKeyboardDetector.isKeyboardVisible()) {
             mGalleryCover.setVisibility(LinearLayout.GONE);

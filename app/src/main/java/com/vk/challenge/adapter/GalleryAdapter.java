@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso;
 import com.vk.challenge.R;
 import com.vk.challenge.data.model.GalleryItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -40,8 +41,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public Callback mCallback;
 
-    private int mSelectedPosition = -1;
-    private int mLastSelectedPosition = -1;
+    private int mSelectedPosition = RecyclerView.NO_POSITION;
+    private int mLastSelectedPosition = RecyclerView.NO_POSITION;
 
     public void setData(List<GalleryItem> data) {
         mData = data;
@@ -52,12 +53,27 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return mData;
     }
 
-    public void selectItem(int adapterPosition, boolean notify) {
-        if (adapterPosition == mSelectedPosition) {
-            return;
+    public GalleryItem getItem(int adapterPosition) {
+        return mData.get(adapterPosition - 1);
+    }
+
+    public void addAndSelect(GalleryItem galleryItem) {
+        if (mData == null) {
+            mData = new ArrayList<>();
         }
+        if (!mData.contains(galleryItem)) {
+            mData.add(0, galleryItem);
+            notifyDataSetChanged();
+        }
+        selectItem(1, true);
+    }
+
+    public void selectItem(int adapterPosition, boolean notify) {
         if (mCallback != null && notify) {
             mCallback.onGalleryItemSelected(mData.get(adapterPosition - 1));
+        }
+        if (adapterPosition == mSelectedPosition) {
+            return;
         }
         mLastSelectedPosition = mSelectedPosition;
         mSelectedPosition = adapterPosition;
@@ -68,6 +84,12 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (mSelectedPosition != -1) {
             notifyItemChanged(mSelectedPosition, "selection");
         }
+    }
+
+
+
+    public int getSelectedPosition() {
+        return mSelectedPosition;
     }
 
     public void setCallback(Callback callback) {

@@ -17,4 +17,20 @@ public class GalleryItem {
     public Uri getUri() {
         return mUri;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        GalleryItem that = (GalleryItem) object;
+
+        return mUri != null ? mUri.equals(that.mUri) : that.mUri == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return mUri != null ? mUri.hashCode() : 0;
+    }
 }
