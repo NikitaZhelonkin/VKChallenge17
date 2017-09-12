@@ -34,7 +34,7 @@
 
         </FrameLayout>
 
-        <TextView
+        <com.vk.challenge.widget.TFTextView
             android:id="@+id/posting_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
     </LinearLayout>
 
 
-    <Button
+    <com.vk.challenge.widget.TFButton
         android:id="@+id/cancel_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
         android:background="@drawable/bg_button_cancel"
         android:text="@string/dialog_cancel"/>
 
-    <Button
+    <com.vk.challenge.widget.TFButton
         android:id="@+id/create_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -15,7 +15,7 @@ import android.util.DisplayMetrics;
  * Created by nikita on 07.09.17.
  */
 
-public class FontBackgroundEditText extends AppCompatEditText {
+public class FontBackgroundEditText extends TFEditText {
 
     private static final int STROKE_WIDTH = 8;//dp
 

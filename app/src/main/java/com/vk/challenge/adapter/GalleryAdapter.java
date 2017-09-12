@@ -48,6 +48,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
+    public List<GalleryItem> getData() {
+        return mData;
+    }
+
     public void selectItem(int adapterPosition, boolean notify) {
         if (adapterPosition == mSelectedPosition) {
             return;
@@ -64,7 +68,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (mSelectedPosition != -1) {
             notifyItemChanged(mSelectedPosition, "selection");
         }
-
     }
 
     public void setCallback(Callback callback) {

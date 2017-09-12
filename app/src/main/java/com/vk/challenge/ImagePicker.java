@@ -33,6 +33,8 @@ public class ImagePicker {
         void onImagePicked(Uri uri, boolean fromCamera);
 
         void onImagePickError(String errorMessage, boolean fromCamera);
+
+        void onImagePickCancel();
     }
 
     private Activity mActivity;
@@ -92,6 +94,10 @@ public class ImagePicker {
                 }
                 return false;
             }
+        }else{
+            if (requestCode == CAMERA_REQ_CODE || requestCode == GALLERY_REQ_CODE) {
+                notifyCancel();
+            }
         }
         return false;
     }
@@ -114,6 +120,12 @@ public class ImagePicker {
     private void notifyError(String errorMessage, boolean fromCamera) {
         if (mCallback != null) {
             mCallback.onImagePickError(errorMessage, fromCamera);
+        }
+    }
+
+    private void notifyCancel(){
+        if (mCallback != null) {
+            mCallback.onImagePickCancel();
         }
     }
 

@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
@@ -90,6 +91,11 @@ public class GalleryWindow extends PopupWindow implements
         cancelLoading();
     }
 
+    @Override
+    public void showAtLocation(View parent, int gravity, int x, int y) {
+        super.showAtLocation(parent, gravity, x, y);
+    }
+
     private void cancelLoading() {
         if (mLoadGalleryTask != null) {
             mLoadGalleryTask.setCallback(null);
@@ -101,7 +107,20 @@ public class GalleryWindow extends PopupWindow implements
 
     @Override
     public void onGalleryLoaded(List<GalleryItem> items) {
+        List<GalleryItem> oldItems = mGalleryAdapter.getData();
         mGalleryAdapter.setData(items);
+        if (oldItems == null || oldItems.size() == 0) {
+            selectItem();
+        }
+    }
+
+    private void selectItem() {
+        if (isShowing()) {
+            List<GalleryItem> items = mGalleryAdapter.getData();
+            if (items != null && items.size() != 0) {
+                mGalleryAdapter.selectItem(1, true);
+            }
+        }
     }
 
 }

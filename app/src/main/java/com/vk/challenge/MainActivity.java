@@ -287,6 +287,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onImagePicked(Uri uri, boolean fromCamera) {
+        if(!isGalleryVisible()){
+            showGallery();
+        }
         mGalleryWindow.clearSelection();
         mPostView.setImage(uri);
     }
@@ -297,21 +300,27 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onImagePickCancel() {
+        if(!isGalleryVisible()){
+            showGallery();
+        }
+    }
+
+    @Override
     public void onItemSelected(BackgroundItem item, int position) {
-        mRecyclerView.smoothScrollToPosition(position);
+        boolean white = item.getDrawable() instanceof ColorDrawable &&
+                ((ColorDrawable) item.getDrawable()).getColor() == Color.WHITE;
+        mPostView.setTrashWithBorder(white);
         if (item instanceof NewBackgroundItem) {
             showGallery();
         } else {
             hideGallery();
-            mPostView.setImage(item.getDrawable());
-
             mGalleryWindow.clearSelection();
+            mPostView.setImage(item.getDrawable());
+            mCurrentFonts = white ? BLANK_FONTS : IMAGE_FONTS;
+            mPostView.setFontStyle(mCurrentFonts[mCurrentFontStyleIdx]);
         }
-        boolean white = item.getDrawable() instanceof ColorDrawable &&
-                ((ColorDrawable) item.getDrawable()).getColor() == Color.WHITE;
-        mPostView.setTrashWithBorder(white);
-        mCurrentFonts = white ? BLANK_FONTS : IMAGE_FONTS;
-        mPostView.setFontStyle(mCurrentFonts[mCurrentFontStyleIdx]);
+        mRecyclerView.smoothScrollToPosition(position);
     }
 
     @Override

@@ -13,7 +13,7 @@
         android:contentDescription="@null"
         android:src="@drawable/ic_logo"/>
 
-    <Button
+    <com.vk.challenge.widget.TFButton
         android:id="@+id/login_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
