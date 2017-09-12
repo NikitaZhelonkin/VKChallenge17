@@ -24,7 +24,7 @@
     </style>
 
     <style name="TextView" parent="@android:style/Widget.TextView">
-        <item name="font">@string/font_roboto_bold</item>
+        <item name="font">@string/font_roboto_regular</item>
     </style>
 
     <style name="EditText.Post" parent="Widget.AppCompat.EditText">

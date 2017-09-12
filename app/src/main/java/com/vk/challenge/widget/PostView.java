@@ -128,10 +128,23 @@ public class PostView extends FrameLayout implements
 
     public Bitmap createBitmap() {
         setEditTextFocusable(false);
-        Bitmap b = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(b);
-        draw(c);
+        Bitmap b = createBitmapInternal(1080);
         setEditTextFocusable(true);
+        return b;
+    }
+
+    private Bitmap createBitmapInternal(int width) {
+        int imageWidth = getWidth() - getPaddingLeft() - getPaddingRight();
+        int imageHeight = getHeight() - getPaddingTop() - getPaddingBottom();
+        float ratio = imageWidth / (float) imageHeight;
+        int height = (int) (width / ratio);
+        float scaleX = width / (float) imageWidth;
+        float scaleY = height / (float) imageHeight;
+        Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        c.clipRect(getPaddingLeft(), getPaddingTop(), getPaddingLeft() + imageWidth, getPaddingTop() + imageHeight);
+        c.scale(scaleX, scaleY);
+        draw(c);
         return b;
     }
 
