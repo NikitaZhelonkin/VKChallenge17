@@ -74,6 +74,9 @@ public class PostView extends FrameLayout implements
     private int mPostTopInset;
     private int mPostBottomInset;
 
+    private int mOldWidth;
+    private int mOldHeight;
+
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
     public PostView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -172,7 +175,9 @@ public class PostView extends FrameLayout implements
                 Rect rect = new Rect();
                 rect.right = getWidth() - stickerView.getMeasuredWidth() / 2;
                 rect.bottom = stickerView.getMeasuredHeight() / 2;
-                stickerView.setPosition(randomPosition(rect));
+                Point point = randomPosition(rect);
+                stickerView.setX(point.x);
+                stickerView.setY(point.y);
 
                 stickerView.setScaleX(0f);
                 stickerView.setScaleY(0f);
@@ -228,6 +233,23 @@ public class PostView extends FrameLayout implements
         }
     }
 
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        int width = right - left;
+        int height = bottom - top;
+        if (changed && mOldWidth != 0 && mOldHeight != 0) {
+            for (final StickerView stickerView : getStickers()) {
+                int endX = (int) (stickerView.getX() / mOldWidth * (float) width);
+                int endY = (int) (stickerView.getY() / mOldHeight * (float) height);
+                stickerView.setX(endX);
+                stickerView.setY(endY);
+            }
+        }
+        mOldWidth = width;
+        mOldHeight = height;
+    }
+
     private int calculatePostHeight() {
         Rect rect = new Rect();
         int insetDiff = Math.abs(mPostBottomInset - mPostTopInset);
@@ -261,27 +283,22 @@ public class PostView extends FrameLayout implements
         }
     }
 
+    protected List<StickerView> getStickers() {
+        return mStickers;
+    }
+
+
     private void setStickerToDelete(View stickerToDelete, float distanceFraction) {
         if (stickerToDelete != null) {
-            stickerToDelete.animate().cancel();
             if (mStickerToDelete == null) {
                 float scale = stickerToDelete.getScaleX();
                 mStickerToDelete = stickerToDelete;
                 mStickerToDelete.setTag(scale);
-
-                mStickerToDelete.animate()
-                        .setListener(null)
-                        .alpha(distanceFraction)
-                        .scaleX(scale * distanceFraction)
-                        .scaleY(scale * distanceFraction)
-                        .setDuration(300)
-                        .start();
-            } else {
-                float scale = (Float) stickerToDelete.getTag();
-                stickerToDelete.setAlpha(distanceFraction);
-                stickerToDelete.setScaleX(scale * distanceFraction);
-                stickerToDelete.setScaleY(scale * distanceFraction);
             }
+            float scale = (Float) stickerToDelete.getTag();
+            stickerToDelete.setAlpha(distanceFraction);
+            stickerToDelete.setScaleX(scale * distanceFraction);
+            stickerToDelete.setScaleY(scale * distanceFraction);
 
         } else {
             if (mStickerToDelete != null) {

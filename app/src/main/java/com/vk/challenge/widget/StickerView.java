@@ -2,11 +2,14 @@ package com.vk.challenge.widget;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.support.annotation.Nullable;
+import android.support.annotation.Px;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 
 /**
  * Created by nikita on 07.09.17.
@@ -24,8 +27,6 @@ public class StickerView extends AppCompatImageView {
     private float mDownY;
     private boolean mDragging;
     private int mTouchSlop;
-
-    private Point mPosition = new Point();
 
     private OnMoveListener mOnMoveListener;
 
@@ -49,9 +50,24 @@ public class StickerView extends AppCompatImageView {
         mTouchSlop = vc.getScaledTouchSlop();
     }
 
-    public void setPosition(Point position) {
-        mPosition = position;
-        updatePosition();
+    @Override
+    public void setX(float x) {
+        super.setX(x - getWidth() / 2);
+    }
+
+    @Override
+    public void setY(float y) {
+        super.setY(y - getHeight() / 2);
+    }
+
+    @Override
+    public float getX() {
+        return super.getX() + getWidth() / 2;
+    }
+
+    @Override
+    public float getY() {
+        return super.getY() + getHeight() / 2;
     }
 
     public void setOnMoveListener(OnMoveListener onMoveListener) {
@@ -81,8 +97,7 @@ public class StickerView extends AppCompatImageView {
                     }
                 }
                 if (mDragging) {
-                    mPosition.offset((int) deltaX, (int) deltaY);
-                    updatePosition();
+                    offset((int) deltaX, (int) deltaY);
                     if (mOnMoveListener != null) {
                         mOnMoveListener.onMove(this);
                     }
@@ -103,8 +118,8 @@ public class StickerView extends AppCompatImageView {
         return super.onTouchEvent(event);
     }
 
-    private void updatePosition(){
-        setX(mPosition.x);
-        setY(mPosition.y);
+    private void offset(int dx, int dy) {
+        setX(getX() + dx);
+        setY(getY() + dy);
     }
 }
