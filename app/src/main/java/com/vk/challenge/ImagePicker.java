@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import java.io.File;
@@ -58,7 +59,9 @@ public class ImagePicker {
                 Log.e("TAG", ex.toString());
             }
             if (photoFile != null) {
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                Uri uri = FileProvider.getUriForFile(mActivity, "com.vk.challenge.fileprovider", photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 mActivity.startActivityForResult(takePictureIntent, CAMERA_REQ_CODE);
             } else {
                 notifyError("Error: can't create file", true);

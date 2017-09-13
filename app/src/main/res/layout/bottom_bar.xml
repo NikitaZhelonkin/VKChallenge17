@@ -30,6 +30,7 @@
         android:layout_marginRight="16dp"
         android:minHeight="32dp"
         android:text="@string/send"
+        android:enabled="false"
         android:textSize="12sp"/>
 
 </LinearLayout>
