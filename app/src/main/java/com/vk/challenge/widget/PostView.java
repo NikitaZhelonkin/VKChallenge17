@@ -28,12 +28,12 @@ import android.widget.LinearLayout;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.vk.challenge.GlideApp;
+import com.vk.challenge.R;
 import com.vk.challenge.ResizeTransformation;
+import com.vk.challenge.data.model.FontStyle;
 import com.vk.challenge.utils.AndroidUtils;
 import com.vk.challenge.utils.KeyboardDetector;
 import com.vk.challenge.utils.MathUtils;
-import com.vk.challenge.R;
-import com.vk.challenge.data.model.FontStyle;
 
 import java.util.ArrayList;
 import java.util.List;

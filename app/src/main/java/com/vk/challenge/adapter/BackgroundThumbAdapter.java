@@ -11,7 +11,6 @@ import com.vk.challenge.data.model.BackgroundItem;
 import com.vk.challenge.data.model.NewBackgroundItem;
 import com.vk.challenge.widget.ThumbView;
 
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;

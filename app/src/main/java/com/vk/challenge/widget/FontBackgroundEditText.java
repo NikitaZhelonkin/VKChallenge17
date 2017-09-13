@@ -7,12 +7,9 @@ import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.support.v7.widget.AppCompatEditText;
 import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-
-import com.vk.challenge.utils.AndroidUtils;
 
 /**
  * Created by nikita on 07.09.17.

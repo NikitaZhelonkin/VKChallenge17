@@ -1,15 +1,11 @@
 package com.vk.challenge.widget;
 
 import android.content.Context;
-import android.graphics.Point;
-import android.graphics.PointF;
 import android.support.annotation.Nullable;
-import android.support.annotation.Px;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
 
 /**
  * Created by nikita on 07.09.17.

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import java.io.File;
@@ -93,7 +92,7 @@ public class ImagePicker {
                 }
                 return false;
             }
-        }else{
+        } else {
             if (requestCode == CAMERA_REQ_CODE || requestCode == GALLERY_REQ_CODE) {
                 notifyCancel();
             }

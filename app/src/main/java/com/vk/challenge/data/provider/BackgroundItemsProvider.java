@@ -8,7 +8,6 @@ import android.support.v4.content.ContextCompat;
 
 import com.vk.challenge.R;
 import com.vk.challenge.data.model.BackgroundItem;
-import com.vk.challenge.data.model.FontStyle;
 import com.vk.challenge.data.model.NewBackgroundItem;
 import com.vk.challenge.widget.CompositeDrawable;
 

@@ -1,8 +1,5 @@
 package com.vk.challenge.data.model;
 
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-
 import com.vk.challenge.R;
 
 /**
