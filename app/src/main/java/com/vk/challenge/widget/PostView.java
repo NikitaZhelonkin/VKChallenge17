@@ -26,7 +26,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.vk.challenge.GlideApp;
+import com.vk.challenge.ResizeTransformation;
 import com.vk.challenge.utils.AndroidUtils;
 import com.vk.challenge.utils.KeyboardDetector;
 import com.vk.challenge.utils.MathUtils;
@@ -221,7 +223,10 @@ public class PostView extends FrameLayout implements
 
     private StickerView createStickerView(String sticker) {
         StickerView stickerView = new StickerView(getContext());
-        Picasso.with(getContext()).load(sticker).into(stickerView);
+        GlideApp.with(getContext()).load(sticker)
+                .placeholder(null)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(stickerView);
         return stickerView;
     }
 
@@ -401,14 +406,16 @@ public class PostView extends FrameLayout implements
     }
 
     public void setImage(Drawable drawable) {
-        Picasso.with(getContext()).cancelRequest(mImageView);
+        GlideApp.with(getContext()).clear(mImageView);
         mImageView.setImageDrawable(drawable);
     }
 
     public void setImage(Uri uri) {
-        Picasso.with(getContext())
+        GlideApp.with(getContext())
                 .load(uri)
-                .transform(new ResizeTransformation(1024))
+                .transform(new ResizeTransformation(1080))
+                .placeholder(null)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(mImageView);
     }
 

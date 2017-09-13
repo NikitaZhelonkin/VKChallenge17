@@ -1,12 +1,14 @@
 package com.vk.challenge.adapter;
 
+import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.vk.challenge.GlideApp;
 import com.vk.challenge.R;
 
 import java.util.List;
@@ -67,8 +69,10 @@ public class StickersAdapter extends RecyclerView.Adapter<StickersAdapter.ViewHo
         }
 
         public void bind(int position) {
-            Picasso.with(itemView.getContext())
+            GlideApp.with(itemView.getContext())
                     .load(mData.get(position))
+                    .placeholder(null)
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .into(mImageView);
         }
 

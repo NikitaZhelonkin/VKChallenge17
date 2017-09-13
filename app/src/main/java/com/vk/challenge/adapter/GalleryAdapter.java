@@ -1,16 +1,28 @@
 package com.vk.challenge.adapter;
 
+import android.app.Activity;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.makeramen.roundedimageview.RoundedTransformationBuilder;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.vk.challenge.GlideApp;
 import com.vk.challenge.R;
+import com.vk.challenge.RoundTransformation;
 import com.vk.challenge.data.model.GalleryItem;
+import com.vk.challenge.utils.AndroidUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,11 +178,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public void bind(final GalleryItem galleryItem, boolean selected) {
             mImageView.setSelected(selected);
             if (galleryItem.getUri() != null) {
-                Picasso.with(itemView.getContext())
+                GlideApp.with(itemView.getContext())
                         .load(galleryItem.getUri())
-                        .centerCrop()
-                        .transform(new RoundedTransformationBuilder().cornerRadiusDp(4).build())
-                        .resizeDimen(R.dimen.gallery_item_approx_size, R.dimen.gallery_item_approx_size)
+                        .transform(new MultiTransformation<>(
+                                new CenterCrop(),
+                                new RoundTransformation(AndroidUtils.dpToPx(itemView.getContext(), 4))
+                        ))
+                        .placeholder(R.drawable.bg_thumb)
+                        .transition(DrawableTransitionOptions.withCrossFade())
                         .into(mImageView);
             } else {
                 mImageView.setImageDrawable(null);
