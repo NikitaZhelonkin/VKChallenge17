@@ -101,7 +101,7 @@ public class PostDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mCallback  = (Callback) context;
+        mCallback = (Callback) context;
     }
 
     @Override
@@ -158,9 +158,8 @@ public class PostDialogFragment extends DialogFragment {
 
             @Override
             public void onError(VKError error) {
-                //TODO check is app resumed
                 dismiss();
-                showError(error.toString());
+                if (error.errorCode != VKError.VK_CANCELED) showError(error.toString());
             }
         });
     }
@@ -176,15 +175,14 @@ public class PostDialogFragment extends DialogFragment {
 
             @Override
             public void onError(VKError error) {
-                //TODO check is app resumed
                 dismiss();
-                showError(error.toString());
+                if (error.errorCode != VKError.VK_CANCELED) showError(error.toString());
             }
         });
     }
 
     private void showError(String message) {
-        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
     private int getMyId() {
