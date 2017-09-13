@@ -11,16 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.MultiTransformation;
-import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.vk.challenge.GlideApp;
 import com.vk.challenge.R;
-import com.vk.challenge.RoundTransformation;
 import com.vk.challenge.data.model.GalleryItem;
 import com.vk.challenge.utils.AndroidUtils;
 
@@ -182,7 +178,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         .load(galleryItem.getUri())
                         .transform(new MultiTransformation<>(
                                 new CenterCrop(),
-                                new RoundTransformation(AndroidUtils.dpToPx(itemView.getContext(), 4))
+                                new RoundedCorners(AndroidUtils.dpToPx(itemView.getContext(), 4))
                         ))
                         .placeholder(R.drawable.bg_thumb)
                         .transition(DrawableTransitionOptions.withCrossFade())

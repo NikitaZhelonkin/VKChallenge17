@@ -21,10 +21,9 @@ import com.vk.challenge.utils.AndroidUtils;
 public class FontBackgroundEditText extends TFEditText {
 
     private static final int CORNER_RADIUS = 4;//dp
-
     private static final int PADDING_HORIZONTAL = 9;//dp
     private static final int PADDING_TOP = 2;//dp
-    private static final int PADDING_BOT = 6;//dp
+    private static final int PADDING_BOT = 4;//dp
 
     private int mBgColor = Color.TRANSPARENT;
 

@@ -4,11 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
-import android.util.Log;
-
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
-
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 
 /**
@@ -17,7 +15,8 @@ import java.security.MessageDigest;
 
 public class ResizeTransformation extends BitmapTransformation {
 
-    private static final String ID = "com.vk.challenge.ResizeTransformation";
+    private static final String ID = "com.vk.challenge.load.resource.bitmap.ResizeTransformation";
+    private static final byte[] ID_BYTES = ID.getBytes(CHARSET);
 
     private int mDesiredWidth;
 
@@ -31,21 +30,29 @@ public class ResizeTransformation extends BitmapTransformation {
         double aspectRatio = (double) toTransform.getHeight() / (double) toTransform.getWidth();
         int targetHeight = (int) (targetWidth * aspectRatio);
         Bitmap result = pool.get(targetWidth, targetHeight, Bitmap.Config.ARGB_8888);
-        // Create a Canvas backed by the result Bitmap.
         Canvas canvas = new Canvas(result);
-        canvas.scale(targetWidth/(float)toTransform.getWidth(),targetHeight/(float)toTransform.getHeight() );
+        canvas.scale(targetWidth / (float) toTransform.getWidth(), targetHeight / (float) toTransform.getHeight());
         Paint paint = new Paint();
-        // Draw the original Bitmap onto the result Bitmap with a transformation.
         canvas.drawBitmap(toTransform, 0, 0, paint);
-        // Since we've replaced our original Bitmap, we return our new Bitmap here. Glide will
-        // will take care of returning our original Bitmap to the BitmapPool for us.
         return result;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof ResizeTransformation) && ((ResizeTransformation) o).mDesiredWidth == mDesiredWidth;
+    }
+
+    @Override
+    public int hashCode() {
+        return ID.hashCode() + mDesiredWidth;
+    }
 
     @Override
     public void updateDiskCacheKey(MessageDigest messageDigest) {
-        messageDigest.update((ID + mDesiredWidth).getBytes(CHARSET));
+        messageDigest.update(ID_BYTES);
+
+        byte[] radiusData = ByteBuffer.allocate(4).putInt(mDesiredWidth).array();
+        messageDigest.update(radiusData);
     }
 
 }

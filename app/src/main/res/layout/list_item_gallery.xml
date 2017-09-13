@@ -6,6 +6,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scaleType="centerCrop"
-    android:background="@drawable/bg_thumb"
     android:foreground="@drawable/fg_thumb"
     android:layout_margin="4dp"/>
