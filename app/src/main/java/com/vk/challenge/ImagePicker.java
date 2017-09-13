@@ -26,8 +26,7 @@ public class ImagePicker {
     private static final int CAMERA_REQ_CODE = 1;
     private static final int GALLERY_REQ_CODE = 2;
 
-    private static Uri sCurrentPhotoUri;
-    private static String sCurrentPhotoPath;
+    private static  String sCurrentPhotoPath;
 
     public interface Callback {
         void onImagePicked(Uri uri, boolean fromCamera);
@@ -56,14 +55,14 @@ public class ImagePicker {
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                notifyError("Error: can't create temp file", true);
+                notifyError("Error: can't create file", true);
                 Log.e("TAG", ex.toString());
             }
             if (photoFile != null) {
-                sCurrentPhotoUri = FileProvider.getUriForFile(mActivity,
-                        "com.vk.challenge.fileprovider", photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, sCurrentPhotoUri);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
                 mActivity.startActivityForResult(takePictureIntent, CAMERA_REQ_CODE);
+            } else {
+                notifyError("Error: can't create file", true);
             }
         } else {
             notifyError("Error: can't find camera", true);
@@ -83,7 +82,7 @@ public class ImagePicker {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == CAMERA_REQ_CODE) {
                 galleryAddPic(sCurrentPhotoPath);
-                notifyPicked(sCurrentPhotoUri, true);
+                notifyPicked(Uri.fromFile(new File(sCurrentPhotoPath)), true);
                 return true;
             } else if (requestCode == GALLERY_REQ_CODE) {
                 Uri selectedImageUri = data.getData();
@@ -105,10 +104,27 @@ public class ImagePicker {
     private File createImageFile() throws IOException {
         String timeStamp = DATE_FORMAT.format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = mActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = getAlbumDir();
+        if (storageDir == null) {
+            return null;
+        }
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
         sCurrentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    private File getAlbumDir() {
+        File storageDir = null;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES), mActivity.getString(R.string.app_name));
+            if (!storageDir.mkdirs()) {
+                if (!storageDir.exists()) {
+                    return null;
+                }
+            }
+        }
+        return storageDir;
     }
 
     private void notifyPicked(Uri uri, boolean fromCamera) {

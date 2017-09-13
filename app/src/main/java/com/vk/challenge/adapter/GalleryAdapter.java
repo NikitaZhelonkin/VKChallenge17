@@ -1,19 +1,16 @@
 package com.vk.challenge.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.vk.challenge.R;
 import com.vk.challenge.data.model.GalleryItem;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,8 +38,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public Callback mCallback;
 
-    private int mSelectedPosition = RecyclerView.NO_POSITION;
-    private int mLastSelectedPosition = RecyclerView.NO_POSITION;
+    private GalleryItem mSelected = null;
+    private GalleryItem mLastSelected = null;
 
     public void setData(List<GalleryItem> data) {
         mData = data;
@@ -57,39 +54,32 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return mData.get(adapterPosition - 1);
     }
 
-    public void addAndSelect(GalleryItem galleryItem) {
-        if (mData == null) {
-            mData = new ArrayList<>();
-        }
-        if (!mData.contains(galleryItem)) {
-            mData.add(0, galleryItem);
-            notifyDataSetChanged();
-        }
-        selectItem(1, true);
-    }
-
-    public void selectItem(int adapterPosition, boolean notify) {
+    public void selectItem(GalleryItem galleryItem, boolean notify) {
         if (mCallback != null && notify) {
-            mCallback.onGalleryItemSelected(mData.get(adapterPosition - 1));
+            mCallback.onGalleryItemSelected(galleryItem);
         }
-        if (adapterPosition == mSelectedPosition) {
+        if (galleryItem.equals(mSelected)) {
             return;
         }
-        mLastSelectedPosition = mSelectedPosition;
-        mSelectedPosition = adapterPosition;
+        mLastSelected = mSelected;
+        mSelected = galleryItem;
 
-        if (mLastSelectedPosition != -1) {
-            notifyItemChanged(mLastSelectedPosition, "selection");
+        if (mLastSelected != null) {
+            int position = mData.indexOf(mLastSelected);
+            if (position != -1) {
+                notifyItemChanged(position + 1, "selection");
+            }
         }
-        if (mSelectedPosition != -1) {
-            notifyItemChanged(mSelectedPosition, "selection");
+        if (mSelected != null) {
+            int position = mData.indexOf(mSelected);
+            if (position != -1) {
+                notifyItemChanged(position + 1, "selection");
+            }
         }
     }
 
-
-
-    public int getSelectedPosition() {
-        return mSelectedPosition;
+    public GalleryItem getSelected() {
+        return mSelected;
     }
 
     public void setCallback(Callback callback) {
@@ -115,7 +105,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
         if (holder instanceof ViewHolder) {
             if (payloads != null && payloads.size() > 0) {
-                ((ViewHolder) holder).mImageView.setSelected(position == mSelectedPosition);
+                GalleryItem item = mData.get(position - 1);
+                ((ViewHolder) holder).mImageView.setSelected(item.equals(mSelected));
                 return;
             }
         }
@@ -125,7 +116,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewHolder) {
-            ((ViewHolder) holder).bind(mData.get(position - 1), position == mSelectedPosition);
+            GalleryItem item = mData.get(position - 1);
+            ((ViewHolder) holder).bind(item, item.equals(mSelected));
         }
     }
 
@@ -185,7 +177,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public void onItemClick(View v) {
             int adapterPosition = getAdapterPosition();
             if (adapterPosition != RecyclerView.NO_POSITION) {
-                selectItem(adapterPosition, true);
+                selectItem(mData.get(adapterPosition - 1), true);
             }
         }
 

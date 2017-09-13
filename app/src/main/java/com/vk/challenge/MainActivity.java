@@ -181,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showGallery(true);
             } else {
-                mGalleryWindow.clearSelection();
                 mThumbsAdapter.backSelection();
             }
         }
@@ -286,11 +285,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onImagePicked(Uri uri, boolean fromCamera) {
-        if(!isGalleryVisible()){
+    public void onImagePicked(final Uri uri, boolean fromCamera) {
+        if (!isGalleryVisible()) {
             showGallery(false);
         }
-        mGalleryWindow.addAndSelect(new GalleryItem(uri));
+        mGalleryWindow.select(uri);
+        mPostView.setImage(uri);
     }
 
     @Override
@@ -362,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements
         if (!requestMediaPermission()) {
             return;
         }
-        if (load) {
+        if(load){
             mGalleryWindow.load();
         }
         mGalleryWindow.setHeight((KeyboardDetector.getKeyboardHeight()));
@@ -391,20 +391,23 @@ public class MainActivity extends AppCompatActivity implements
                         .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, PERM_REQ_CODE);
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{
+                                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERM_REQ_CODE);
                             }
                         })
                         .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mThumbsAdapter.backSelection();
-                                mGalleryWindow.clearSelection();
                             }
                         })
                         .create()
                         .show();
             } else {
-                requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, PERM_REQ_CODE);
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERM_REQ_CODE);
             }
             return false;
         } else {
@@ -421,9 +424,6 @@ public class MainActivity extends AppCompatActivity implements
         return ActivityCompat.shouldShowRequestPermissionRationale(this, permission);
     }
 
-    private void requestPermission(String permission, int requestCode) {
-        ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
-    }
 
     private void post(File file) {
         PostDialogFragment.create(file).show(getSupportFragmentManager(), "post");

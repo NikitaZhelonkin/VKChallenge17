@@ -2,10 +2,8 @@ package com.vk.challenge.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -20,7 +18,6 @@ import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -256,25 +253,36 @@ public class PostView extends FrameLayout implements
         int distance = MathUtils.distanceBetween(stickerPoint, trashPoint);
 
         if (distance <= deleteDistance && isTrashVisible()) {
-            showTrash();
             setTrashActive(true);
-            setStickerToDelete(stickerView);
-            float scale = (Float) stickerView.getTag();
-            stickerView.setAlpha(distance / (float) deleteDistance);
-            stickerView.setScaleX(scale * distance / (float) deleteDistance);
-            stickerView.setScaleY(scale * distance / (float) deleteDistance);
+            setStickerToDelete(stickerView, distance / (float) deleteDistance);
         }  else {
             setTrashActive(false);
-            setStickerToDelete(null);
+            setStickerToDelete(null, 0);
         }
     }
 
-    private void setStickerToDelete(View stickerToDelete) {
+    private void setStickerToDelete(View stickerToDelete, float distanceFraction) {
         if (stickerToDelete != null) {
+            stickerToDelete.animate().cancel();
             if (mStickerToDelete == null) {
+                float scale = stickerToDelete.getScaleX();
                 mStickerToDelete = stickerToDelete;
-                mStickerToDelete.setTag(stickerToDelete.getScaleX());
+                mStickerToDelete.setTag(scale);
+
+                mStickerToDelete.animate()
+                        .setListener(null)
+                        .alpha(distanceFraction)
+                        .scaleX(scale * distanceFraction)
+                        .scaleY(scale * distanceFraction)
+                        .setDuration(300)
+                        .start();
+            } else {
+                float scale = (Float) stickerToDelete.getTag();
+                stickerToDelete.setAlpha(distanceFraction);
+                stickerToDelete.setScaleX(scale * distanceFraction);
+                stickerToDelete.setScaleY(scale * distanceFraction);
             }
+
         } else {
             if (mStickerToDelete != null) {
                 float scale = (Float) mStickerToDelete.getTag();
@@ -380,7 +388,6 @@ public class PostView extends FrameLayout implements
     }
 
     public void setImage(Uri uri) {
-        setBackground(null);
         Picasso.with(getContext())
                 .load(uri)
                 .transform(new ResizeTransformation(1024))

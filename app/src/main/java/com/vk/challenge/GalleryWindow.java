@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.PopupWindow;
 import com.vk.challenge.adapter.GalleryAdapter;
 import com.vk.challenge.data.LoadGalleryTask;
 import com.vk.challenge.data.model.GalleryItem;
+import com.vk.challenge.data.provider.GalleryPhotosProvider;
 import com.vk.challenge.widget.GalleryLayoutManager;
 
 import java.util.List;
@@ -23,7 +25,8 @@ import java.util.List;
 
 public class GalleryWindow extends PopupWindow implements
         LoadGalleryTask.Callback,
-        GalleryAdapter.Callback{
+        GalleryAdapter.Callback,
+        GalleryPhotosProvider.OnContentChangeListener{
 
 
     private LoadGalleryTask mLoadGalleryTask;
@@ -31,6 +34,8 @@ public class GalleryWindow extends PopupWindow implements
     private GalleryAdapter mGalleryAdapter;
 
     private GalleryAdapter.Callback mCallback;
+
+    private GalleryPhotosProvider mPhotosProvider;
 
     @SuppressLint("InflateParams")
     public GalleryWindow(Context context) {
@@ -45,8 +50,10 @@ public class GalleryWindow extends PopupWindow implements
         recyclerView.setLayoutManager(new GalleryLayoutManager(context));
 
         recyclerView.setAdapter(mGalleryAdapter);
-    }
 
+        mPhotosProvider = GalleryPhotosProvider.getInstance(context);
+        mPhotosProvider.setContentObserver(this);
+    }
 
     public void setCallback(GalleryAdapter.Callback callback) {
         mCallback = callback;
@@ -73,12 +80,8 @@ public class GalleryWindow extends PopupWindow implements
         }
     }
 
-    public void addAndSelect(GalleryItem galleryItem){
-        mGalleryAdapter.addAndSelect(galleryItem);
-    }
-
-    public void clearSelection(){
-        mGalleryAdapter.selectItem(RecyclerView.NO_POSITION, false);
+    public void select(Uri uri){
+        mGalleryAdapter.selectItem(new GalleryItem(uri), false);
     }
 
     public void load() {
@@ -89,19 +92,20 @@ public class GalleryWindow extends PopupWindow implements
     }
 
     public void release() {
+        mPhotosProvider.setContentObserver(null);
         if (isShowing()) {
             dismiss();
         }
         cancelLoading();
+
     }
 
     @Override
     public void showAtLocation(View parent, int gravity, int x, int y) {
         super.showAtLocation(parent, gravity, x, y);
-        int selectPosition = mGalleryAdapter.getSelectedPosition() != RecyclerView.NO_POSITION ?
-                mGalleryAdapter.getSelectedPosition() : 1;
-        if (selectPosition < mGalleryAdapter.getItemCount()) {
-            mGalleryAdapter.selectItem(selectPosition, true);
+        if (mGalleryAdapter.getItemCount() > 1) {
+            mGalleryAdapter.selectItem(mGalleryAdapter.getSelected() == null ?
+                    mGalleryAdapter.getItem(1) : mGalleryAdapter.getSelected(), true);
         }
     }
 
@@ -123,11 +127,16 @@ public class GalleryWindow extends PopupWindow implements
         }
     }
 
+    @Override
+    public void onChange() {
+        load();
+    }
+
     private void selectItem() {
         if (isShowing()) {
             List<GalleryItem> items = mGalleryAdapter.getData();
             if (items != null && items.size() != 0) {
-                mGalleryAdapter.selectItem(1, true);
+                mGalleryAdapter.selectItem(items.get(0), true);
             }
         }
     }

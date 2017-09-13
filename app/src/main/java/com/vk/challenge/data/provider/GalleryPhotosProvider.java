@@ -2,8 +2,11 @@ package com.vk.challenge.data.provider;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.v4.content.ContentResolverCompat;
 
@@ -15,6 +18,10 @@ import java.util.List;
  */
 
 public class GalleryPhotosProvider {
+
+    public interface OnContentChangeListener {
+        void onChange();
+    }
 
     @SuppressLint("StaticFieldLeak")
     private static GalleryPhotosProvider sInstance;
@@ -33,6 +40,7 @@ public class GalleryPhotosProvider {
 
     private Context mContext;
 
+    private OnContentChangeListener mOnContentChangeListener;
 
     public static GalleryPhotosProvider getInstance(Context context) {
         if (sInstance == null) {
@@ -47,6 +55,19 @@ public class GalleryPhotosProvider {
 
     private GalleryPhotosProvider(Context context) {
         mContext = context.getApplicationContext();
+        mContext.getContentResolver().registerContentObserver(CONTENT_URI, false, new ContentObserver(new Handler(Looper.getMainLooper())) {
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                if (mOnContentChangeListener != null) {
+                    mOnContentChangeListener.onChange();
+                }
+            }
+        });
+    }
+
+    public void setContentObserver(OnContentChangeListener listener) {
+        mOnContentChangeListener = listener;
     }
 
     public List<String> getCameraPhotos() {
