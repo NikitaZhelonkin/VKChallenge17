@@ -201,8 +201,8 @@ public class PostView extends FrameLayout implements
                     .alpha(0)
                     .scaleY(0)
                     .scaleX(0)
-                    .x(trashPoint.x - stickerView.getWidth() / 2)
-                    .y(trashPoint.y - stickerView.getHeight() / 2)
+                    .x(trashPoint.x )
+                    .y(trashPoint.y)
                     .setDuration(300)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
@@ -269,7 +269,7 @@ public class PostView extends FrameLayout implements
     public void onMove(StickerView stickerView) {
         int deleteDistance = AndroidUtils.dpToPx(getContext(), 48);
 
-        Point stickerPoint = getChildMidPoint(stickerView);
+        Point stickerPoint = new Point((int) stickerView.getX(), (int) stickerView.getY());
         Point trashPoint = getChildMidPoint(mTrashView);
 
         int distance = MathUtils.distanceBetween(stickerPoint, trashPoint);
@@ -467,7 +467,7 @@ public class PostView extends FrameLayout implements
         mTrashView.animate().cancel();
         mTrashView.animate()
                 .alpha(1)
-                .translationY(0)
+                .translationY(mMode == MODE_POST ? 0 : -mPostBottomInset)
                 .setListener(null)
                 .setDuration(300)
                 .start();
