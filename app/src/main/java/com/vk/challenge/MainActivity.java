@@ -39,7 +39,6 @@ import com.vk.challenge.data.provider.BackgroundItemsProvider;
 import com.vk.challenge.data.model.FontStyle;
 import com.vk.challenge.utils.AndroidUtils;
 import com.vk.challenge.utils.KeyboardDetector;
-import com.vk.challenge.widget.ChangeBoundsPost;
 import com.vk.challenge.widget.PostView;
 import com.vk.challenge.widget.ThumbsLayoutManager;
 import com.vk.sdk.VKAccessToken;
@@ -228,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
-        TransitionManager.beginDelayedTransition(mContentLayout, new ChangeBoundsPost(mPostView));
+        TransitionManager.beginDelayedTransition(mContentLayout, new ChangeBounds());
         if (tab.getPosition() == TAB_POST) {
             mPostView.setMode(PostView.MODE_POST);
         } else if (tab.getPosition() == TAB_HISTORY) {

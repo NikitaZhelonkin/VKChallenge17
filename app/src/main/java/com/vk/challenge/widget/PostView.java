@@ -74,9 +74,6 @@ public class PostView extends FrameLayout implements
     private int mPostTopInset;
     private int mPostBottomInset;
 
-    private int mOldWidth;
-    private int mOldHeight;
-
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
     public PostView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -234,20 +231,16 @@ public class PostView extends FrameLayout implements
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        int width = right - left;
-        int height = bottom - top;
-        if (changed && mOldWidth != 0 && mOldHeight != 0) {
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (oldw != 0 && oldh != 0) {
             for (final StickerView stickerView : getStickers()) {
-                int endX = (int) (stickerView.getX() / mOldWidth * (float) width);
-                int endY = (int) (stickerView.getY() / mOldHeight * (float) height);
+                float endX = stickerView.getX() / oldw * (float) w;
+                float endY = stickerView.getY() / oldh * (float) h;
                 stickerView.setX(endX);
                 stickerView.setY(endY);
             }
         }
-        mOldWidth = width;
-        mOldHeight = height;
     }
 
     private int calculatePostHeight() {
