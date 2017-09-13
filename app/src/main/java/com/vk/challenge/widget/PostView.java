@@ -170,8 +170,9 @@ public class PostView extends FrameLayout implements
             @Override
             public void run() {
                 Rect rect = new Rect();
-                rect.right = getWidth() - stickerView.getMeasuredWidth() / 2;
-                rect.bottom = stickerView.getMeasuredHeight() / 2;
+                rect.top = mPostTopInset;
+                rect.right = getWidth();
+                rect.bottom = getHeight() - mPostBottomInset;
                 Point point = randomPosition(rect);
                 stickerView.setX(point.x);
                 stickerView.setY(point.y);
@@ -198,8 +199,8 @@ public class PostView extends FrameLayout implements
                     .alpha(0)
                     .scaleY(0)
                     .scaleX(0)
-                    .x(trashPoint.x )
-                    .y(trashPoint.y)
+                    .x(trashPoint.x - stickerView.getWidth() / 2)
+                    .y(trashPoint.y - stickerView.getHeight() / 2)
                     .setDuration(300)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
@@ -255,7 +256,7 @@ public class PostView extends FrameLayout implements
     @Override
     public void onStartMove(StickerView stickerView) {
         bringStickerToFront(stickerView);
-        mHandler.postDelayed(mShowTrashRunnable, 500);
+        mHandler.postDelayed(mShowTrashRunnable, 300);
     }
 
     @Override
@@ -479,6 +480,7 @@ public class PostView extends FrameLayout implements
         mTrashView.animate().cancel();
         mTrashView.animate()
                 .alpha(0)
+                .setStartDelay(200)
                 .translationY(mTrashView.getHeight() / 2)
                 .setListener(new AnimatorListenerAdapter() {
                     @Override

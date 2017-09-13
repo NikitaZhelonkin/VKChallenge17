@@ -1,5 +1,6 @@
 package com.vk.challenge.adapter;
 
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import com.squareup.picasso.Picasso;
 import com.vk.challenge.R;
 import com.vk.challenge.data.model.GalleryItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -42,8 +44,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private GalleryItem mLastSelected = null;
 
     public void setData(List<GalleryItem> data) {
+        List<GalleryItem> oldData = mData;
         mData = data;
-        notifyDataSetChanged();
+        DiffCallback diffCallback = new DiffCallback(oldData, mData);
+        DiffUtil.calculateDiff(diffCallback).dispatchUpdatesTo(this);
     }
 
     public List<GalleryItem> getData() {
@@ -181,5 +185,44 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
         }
 
+    }
+
+    private class DiffCallback extends DiffUtil.Callback {
+        private List<Object> oldItems;
+        private List<Object> newItems;
+
+        public DiffCallback(List<GalleryItem> oldItems, List<GalleryItem> newItems) {
+            Object header = new Object();
+            this.oldItems = new ArrayList<>();
+            this.oldItems.add(header);
+            if (oldItems != null) {
+                this.oldItems.addAll(oldItems);
+            }
+            this.newItems = new ArrayList<>();
+            this.newItems.add(header);
+            if (oldItems != null) {
+                this.newItems.addAll(newItems);
+            }
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldItems.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newItems.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldItems.get(oldItemPosition).equals(newItems.get(newItemPosition));
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return true;
+        }
     }
 }
