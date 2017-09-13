@@ -260,23 +260,24 @@ public class MainActivity extends AppCompatActivity implements
 
     @OnClick(R.id.sendButton)
     public void onSendClick(View v) {
-        Bitmap bitmap = mPostView.createBitmap();
-        try {
-            final File file = new VKUploadImage(bitmap, VKImageParameters.jpgImage(0.9f)).getTmpFile();
-            if (file != null) {
-                AndroidUtils.hideKeyboard(mEditText);
-                mEditText.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
+        AndroidUtils.hideKeyboard(mEditText);
+        mEditText.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = mPostView.createBitmap();
+                try {
+                    final File file = new VKUploadImage(bitmap, VKImageParameters.jpgImage(0.9f)).getTmpFile();
+                    if (file != null) {
                         post(file);
+
+                    } else {
+                        showError("Unknown Error");
                     }
-                }, 150);
-            } else {
-                showError("Unknown Error");
+                } finally {
+                    bitmap.recycle();
+                }
             }
-        } finally {
-            bitmap.recycle();
-        }
+        }, 150);
     }
 
     @Override
@@ -354,8 +355,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onCreateMoreClick() {
-        Toast.makeText(this, "OnMore", Toast.LENGTH_SHORT).show();
-        //TODO reset all
+        mCurrentFontStyleIdx = 0;
+        mThumbsAdapter.selectItem(0);
+        mEditText.setText(null);
+        mPostView.removeStickers();
     }
 
     private void showGallery(boolean load) {

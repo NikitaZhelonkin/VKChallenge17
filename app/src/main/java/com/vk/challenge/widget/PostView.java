@@ -191,6 +191,13 @@ public class PostView extends FrameLayout implements
         mStickers.add(stickerView);
     }
 
+    public void removeStickers() {
+        for (StickerView sticker : mStickers) {
+            removeView(sticker);
+        }
+        mStickers.clear();
+    }
+
     private void removeSticker(final StickerView stickerView) {
         if (mStickers.contains(stickerView)) {
             mStickers.remove(stickerView);
