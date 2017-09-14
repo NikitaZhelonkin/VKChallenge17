@@ -21,6 +21,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -76,6 +77,8 @@ public class PostView extends FrameLayout implements
     private int mPostTopInset;
     private int mPostBottomInset;
 
+    private int mTouchSlop;
+
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
     public PostView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -97,6 +100,9 @@ public class PostView extends FrameLayout implements
         mPostBottomInset = a.getDimensionPixelSize(R.styleable.PostView_postBottomInset, 0);
         a.recycle();
 
+        ViewConfiguration vc = ViewConfiguration.get(context);
+        mTouchSlop = vc.getScaledTouchSlop();
+
         setMode(MODE_POST);
     }
 
@@ -106,6 +112,8 @@ public class PostView extends FrameLayout implements
         mImageView = (ImageView) findViewById(R.id.post_image_view);
         mEditText = (FontBackgroundEditText) findViewById(R.id.post_edit_text);
         mTrashView = (ImageView) findViewById(R.id.trash_fab);
+
+        mEditText.setOnTouchListener(mEditTextTouchDelegate);
     }
 
     public void setFontStyle(FontStyle fontStyle) {
@@ -282,7 +290,7 @@ public class PostView extends FrameLayout implements
         if (distance <= deleteDistance && isTrashVisible()) {
             setTrashActive(true);
             setStickerToDelete(stickerView, distance / (float) deleteDistance);
-        }  else {
+        } else {
             setTrashActive(false);
             setStickerToDelete(null, 0);
         }
@@ -298,16 +306,16 @@ public class PostView extends FrameLayout implements
             if (mStickerToDelete == null) {
                 float scale = stickerToDelete.getScaleX();
                 mStickerToDelete = stickerToDelete;
-                mStickerToDelete.setTag(scale);
+                mStickerToDelete.setTag(R.id.sticker_scale, scale);
             }
-            float scale = (Float) stickerToDelete.getTag();
+            float scale = (Float) stickerToDelete.getTag(R.id.sticker_scale);
             stickerToDelete.setAlpha(distanceFraction);
             stickerToDelete.setScaleX(scale * distanceFraction);
             stickerToDelete.setScaleY(scale * distanceFraction);
 
         } else {
             if (mStickerToDelete != null) {
-                float scale = (Float) mStickerToDelete.getTag();
+                float scale = (Float) mStickerToDelete.getTag(R.id.sticker_scale);
                 mStickerToDelete.animate()
                         .setListener(null)
                         .alpha(1)
@@ -330,6 +338,60 @@ public class PostView extends FrameLayout implements
         mHandler.removeCallbacks(mShowTrashRunnable);
     }
 
+    private OnTouchListener mEditTextTouchDelegate = new OnTouchListener() {
+        private int mLastX;
+        private int mLastY;
+        private MotionEvent mLastDownEvent;
+        private View mDelegate;
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            final int x = (int) (mEditText.getLeft() + event.getX());
+            final int y = (int) (mEditText.getTop() + event.getY());
+            boolean result;
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_POINTER_DOWN:
+                case MotionEvent.ACTION_DOWN:
+                    mLastX = x;
+                    mLastY = y;
+                    mLastDownEvent = MotionEvent.obtain(event);
+                    return false;
+                case MotionEvent.ACTION_MOVE:
+                    View view = findSticker(x, y);
+                    int dX = Math.abs(x - mLastX);
+                    int dY = Math.abs(y - mLastY);
+                    mLastX = x;
+                    mLastY = y;
+                    if ((dX > mTouchSlop || dY > mTouchSlop) && mDelegate == null && view != null && mLastDownEvent != null) {
+                        MotionEvent cancelEvent = MotionEvent.obtain(event);
+                        cancelEvent.setAction(MotionEvent.ACTION_CANCEL);
+                        mEditText.dispatchTouchEvent(cancelEvent);
+                        cancelEvent.recycle();
+                        mDelegate = view;
+                        mDelegate.dispatchTouchEvent(mLastDownEvent);
+                        mLastDownEvent.recycle();
+                        mLastDownEvent = null;
+                    }
+                    if (mDelegate != null) {
+                        mDelegate.dispatchTouchEvent(event);
+                    }
+                    result = mDelegate != null;
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_UP:
+                    result = mDelegate != null;
+                    if (mDelegate != null) {
+                        mDelegate.dispatchTouchEvent(event);
+                        mDelegate = null;
+                    }
+                    break;
+                default:
+                    result = mDelegate != null;
+            }
+            return result;
+        }
+    };
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         return ev.getPointerCount() >= 2;
@@ -341,14 +403,20 @@ public class PostView extends FrameLayout implements
             return false;
         }
         switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_DOWN:
-                if (event.getPointerCount() == 2) {
-                    mTargetSticker = findTargetSticker(event);
+            case MotionEvent.ACTION_POINTER_DOWN:
+            case MotionEvent.ACTION_MOVE:
+                if (event.getPointerCount() == 2 && mTargetSticker == null) {
+                    Point focusPoint = MathUtils.midPoint(
+                            event.getX(0), event.getY(0),
+                            event.getX(1), event.getY(1)
+                    );
+                    mTargetSticker = findStickerToTransform(focusPoint.x, focusPoint.y);
                 }
+                invalidate();
                 break;
-            case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
                 mTargetSticker = null;
                 break;
         }
@@ -396,7 +464,6 @@ public class PostView extends FrameLayout implements
     @Override
     public void onRotationBegin(RotationGestureDetector rotationDetector) {
         mLastAngle = rotationDetector.getStartAngle();
-
     }
 
     @Override
@@ -416,22 +483,6 @@ public class PostView extends FrameLayout implements
                 .placeholder(null)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(mImageView);
-    }
-
-    private View findTargetSticker(MotionEvent event) {
-        Point midPoint = MathUtils.midPoint(
-                event.getX(0),
-                event.getY(0),
-                event.getX(1),
-                event.getY(1));
-        Rect rect = new Rect();
-        for (View sticker : mStickers) {
-            sticker.getHitRect(rect);
-            if (rect.contains(midPoint.x, midPoint.y)) {
-                return sticker;
-            }
-        }
-        return mStickers.size() != 0 ? mStickers.get(mStickers.size() - 1) : null;
     }
 
     private void bringStickerToFront(View v) {
@@ -456,7 +507,7 @@ public class PostView extends FrameLayout implements
         return new Random().nextInt(90) - 45;
     }
 
-    private Runnable mShowTrashRunnable =new Runnable() {
+    private Runnable mShowTrashRunnable = new Runnable() {
         @Override
         public void run() {
             showTrash();
@@ -480,7 +531,7 @@ public class PostView extends FrameLayout implements
                 .start();
     }
 
-    private boolean isTrashVisible(){
+    private boolean isTrashVisible() {
         return mTrashView.getVisibility() == View.VISIBLE;
     }
 
@@ -517,5 +568,40 @@ public class PostView extends FrameLayout implements
         mTrashView.setScaleX(active ? 1.1f : 1.0f);
         mTrashView.setScaleY(active ? 1.1f : 1.0f);
         mTrashView.setSelected(active);
+    }
+
+    private View findStickerToTransform(int x, int y) {
+        View sticker = findSticker(x, y);
+        if (sticker != null) {
+            return sticker;
+        }
+        if (mStickers.size() == 0) {
+            return null;
+        }
+        sticker = mStickers.get(0);
+        int minDistance = distanceBetweenPointAndView(x, y, sticker);
+        for (View s : mStickers) {
+            int distance = distanceBetweenPointAndView(x, y, s);
+            if (distance < minDistance) {
+                minDistance = distance;
+                sticker = s;
+            }
+        }
+        return sticker;
+    }
+
+    private View findSticker(int x, int y) {
+        Rect hitRect = new Rect();
+        for (View sticker : mStickers) {
+            sticker.getHitRect(hitRect);
+            if (hitRect.contains(x, y)) {
+                return sticker;
+            }
+        }
+        return null;
+    }
+
+    private int distanceBetweenPointAndView(int x, int y, View view) {
+        return MathUtils.distanceBetween(x, y, view.getX(), view.getY());
     }
 }
