@@ -44,11 +44,13 @@
         <item name="android:inputType">textMultiLine|textNoSuggestions</item>
     </style>
 
-    <style name="Theme.BottomSheetDialog.Stickers" parent="Theme.Design.Light.BottomSheetDialog"/>
+    <style name="Theme.BottomSheetDialog.Stickers" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowAnimationStyle">@style/Animation.Slide</item>
+    </style>
 
-    <style name="Animation.Popup" parent="Animation.Design.BottomSheetDialog">
-        <item name="android:windowEnterAnimation">@anim/popup_in</item>
-        <item name="android:windowExitAnimation">@anim/popup_out</item>
+    <style name="Animation.Slide" parent="Animation.Design.BottomSheetDialog">
+        <item name="android:windowEnterAnimation">@anim/slide_in</item>
+        <item name="android:windowExitAnimation">@anim/slide_out</item>
     </style>
 
     <style name="Theme.Dialog.Post" parent="@style/ThemeOverlay.AppCompat.Dialog">
@@ -66,8 +68,5 @@
         <item name="font">@string/font_roboto_medium</item>
         <item name="android:textColor">@color/tab_text_color</item>
     </style>
-
-
-
 
 </resources>

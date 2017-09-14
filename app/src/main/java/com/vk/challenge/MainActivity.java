@@ -9,9 +9,12 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -106,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private FontStyle[] mCurrentFonts = BLANK_FONTS;
 
+    private Handler mHandler = new Handler(Looper.getMainLooper());
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,6 +168,12 @@ public class MainActivity extends AppCompatActivity implements
 
 
         mThumbsAdapter.selectItem(0);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -253,14 +264,20 @@ public class MainActivity extends AppCompatActivity implements
 
     @OnClick(R.id.action_sticker_btn)
     public void onStickerClick(View v) {
-        StickerDialogFragment.create().show(getSupportFragmentManager(), "strickers");
+        AndroidUtils.hideKeyboard(mEditText);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                StickerDialogFragment.create().show(getSupportFragmentManager(), "strickers");
+            }
+        }, 150);
     }
 
     @OnClick(R.id.sendButton)
     public void onSendClick(View v) {
         hideGallery();
         AndroidUtils.hideKeyboard(mEditText);
-        mEditText.postDelayed(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 Bitmap bitmap = mPostView.createBitmap();
@@ -331,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onTakePhotoClick() {
         AndroidUtils.hideKeyboard(mEditText);
-        mEditText.postDelayed(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mImagePicker.takePhoto();
@@ -343,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onOpenExternalGalleryClick() {
         AndroidUtils.hideKeyboard(mEditText);
-        mEditText.postDelayed(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mImagePicker.pickFromGallery();

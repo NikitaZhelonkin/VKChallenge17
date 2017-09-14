@@ -41,7 +41,7 @@ public class GalleryWindow extends PopupWindow implements
     public GalleryWindow(Context context) {
         super(LayoutInflater.from(context).inflate(R.layout.layout_gallery, null), ViewGroup.LayoutParams.MATCH_PARENT,
                 context.getResources().getDimensionPixelSize(R.dimen.keyboard_height), false);
-        setAnimationStyle(R.style.Animation_Popup);
+        setAnimationStyle(R.style.Animation_Slide);
         setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
         mGalleryAdapter = new GalleryAdapter();

@@ -275,7 +275,7 @@ public class PostView extends FrameLayout implements
     @Override
     public void onStartMove(StickerView stickerView) {
         bringStickerToFront(stickerView);
-        mHandler.postDelayed(mShowTrashRunnable, 300);
+        mHandler.postDelayed(mShowTrashRunnable, 250);
     }
 
     @Override
