@@ -258,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @OnClick(R.id.sendButton)
     public void onSendClick(View v) {
+        hideGallery();
         AndroidUtils.hideKeyboard(mEditText);
         mEditText.postDelayed(new Runnable() {
             @Override

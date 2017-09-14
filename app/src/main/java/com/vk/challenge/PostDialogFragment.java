@@ -53,7 +53,7 @@ public class PostDialogFragment extends DialogFragment {
     @BindView(R.id.loader_success_image)
     ImageView mSuccessImage;
     @BindView(R.id.progressBar)
-    ProgressBar mProgressBar;
+    View mProgressBar;
     @BindView(R.id.posting_text)
     TextView mPostingText;
 

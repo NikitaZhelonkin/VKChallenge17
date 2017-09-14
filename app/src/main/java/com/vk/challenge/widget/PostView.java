@@ -145,7 +145,6 @@ public class PostView extends FrameLayout implements
         float scaleY = height / (float) imageHeight;
         Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(b);
-        c.clipRect(getPaddingLeft(), getPaddingTop(), getPaddingLeft() + imageWidth, getPaddingTop() + imageHeight);
         c.scale(scaleX, scaleY);
         draw(c);
         return b;

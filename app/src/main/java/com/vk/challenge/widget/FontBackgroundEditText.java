@@ -18,9 +18,6 @@ import android.util.DisplayMetrics;
 public class FontBackgroundEditText extends TFEditText {
 
     private static final int CORNER_RADIUS = 4;//dp
-    private static final int PADDING_HORIZONTAL = 9;//dp
-    private static final int PADDING_TOP = 2;//dp
-    private static final int PADDING_BOT = 4;//dp
 
     private int mBgColor = Color.TRANSPARENT;
 
@@ -29,10 +26,6 @@ public class FontBackgroundEditText extends TFEditText {
     private Path mBgPath;
 
     private RectF mLineBounds = new RectF();
-
-    private int mPaddingHorizontal;
-    private int mPaddingTop;
-    private int mPaddingBot;
 
     public FontBackgroundEditText(Context context) {
         super(context);
@@ -52,12 +45,8 @@ public class FontBackgroundEditText extends TFEditText {
     private void init(Context context) {
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         mBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBgPaint.setDither(true);
         mBgPaint.setPathEffect(new CornerPathEffect(dm.density * CORNER_RADIUS));
         mBgPath = new Path();
-        mPaddingHorizontal = (int) (dm.density * PADDING_HORIZONTAL);
-        mPaddingTop = (int) (dm.density * PADDING_TOP);
-        mPaddingBot = (int) (dm.density * PADDING_BOT);
     }
 
     public void setFontBackgroundColor(int color) {
@@ -104,17 +93,21 @@ public class FontBackgroundEditText extends TFEditText {
     }
 
     private RectF getLineBounds(int line) {
-        float left = getLayout().getLineLeft(line) - mPaddingHorizontal;
-        float right = getLayout().getLineRight(line) + mPaddingHorizontal;
+        float left = getLayout().getLineLeft(line) - getPaddingLeft();
+        float right = getLayout().getLineRight(line) + getPaddingRight();
         float top = getLayout().getLineTop(line);
         float bot = getLayout().getLineBottom(line);
+
         if (line == 0) {
-            top -= mPaddingTop;
+            top -= getPaddingTop();
         }
+
         if (line == getLayout().getLineCount() - 1) {
-            bot += mPaddingBot;
+            bot += getPaddingBottom();
         }
+
         mLineBounds.set(left, top, right, bot);
+        mLineBounds.offset(getPaddingLeft(), getPaddingTop());
         return mLineBounds;
     }
 }
