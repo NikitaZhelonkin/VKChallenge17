@@ -1,4 +1,4 @@
-# <img width="36" height="36" src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"/>  VKChallenge
+# <img width="30" height="30" src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"/>  VKChallenge
 
 An application for a Vkontakte <a href="https://vk.com/wall-104669514_37">contest</a>
 
