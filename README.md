@@ -6,4 +6,4 @@ An application for a Vkontakte <a href="https://vk.com/wall-104669514_37">contes
 
 #### Demo ####
 
-[<img src="https://github.com/NikitaZhelonkin/VkChallenge17/raw/master/demo.gif" width="270">](https://vk.com/video-104669514_456239018)
+[<img src="https://github.com/NikitaZhelonkin/VkChallenge17/raw/master/demo.gif" width="360">](https://vk.com/video-104669514_456239018)
