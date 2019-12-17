@@ -4,4 +4,6 @@ An application for a Vkontakte <a href="https://vk.com/wall-104669514_37">contes
 
 <p><a href="https://vk.com/wall-104669514_41">Result</a>: Prize 50 000 RUB
 
-![](app_sample.png)
+#### Demo ####
+
+[<img src="https://github.com/NikitaZhelonkin/VkChallenge17/raw/master/demo.gif" width="270">](https://vk.com/video-104669514_456239018)
